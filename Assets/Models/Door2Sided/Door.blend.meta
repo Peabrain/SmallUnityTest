@@ -1,17 +1,24 @@
 fileFormatVersion: 2
-guid: 20c1273e527e5064fa716bdc6bbbf56e
-timeCreated: 1472828263
+guid: d43ed9e5609ec6c4dbb094b8638c0869
+timeCreated: 1472840659
 licenseType: Free
 ModelImporter:
   serializedVersion: 19
   fileIDToRecycleName:
-    100000: //RootNode
-    400000: //RootNode
-    2300000: //RootNode
-    3300000: //RootNode
-    4300000: Cube
+    100000: Door
+    100002: //RootNode
+    100004: Spaceship
+    400000: Door
+    400002: //RootNode
+    400004: Spaceship
+    2300000: Door
+    2300002: Spaceship
+    2300004: //RootNode
+    3300000: Door
+    3300002: Spaceship
+    3300004: //RootNode
+    4300000: Door
     4300002: Spaceship
-    6400000: //RootNode
     7400000: Default Take
     9500000: //RootNode
   materials:
@@ -40,7 +47,7 @@ ModelImporter:
     lODScreenPercentages: []
     globalScale: 1
     meshCompression: 0
-    addColliders: 1
+    addColliders: 0
     importBlendShapes: 1
     swapUVChannels: 0
     generateSecondaryUV: 1

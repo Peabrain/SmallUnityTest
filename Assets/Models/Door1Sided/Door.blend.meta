@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: 20c1273e527e5064fa716bdc6bbbf56e
-timeCreated: 1472828263
+guid: 414bf689d8d73d5438a1b1b423faba1d
+timeCreated: 1472850578
 licenseType: Free
 ModelImporter:
   serializedVersion: 19
@@ -9,9 +9,7 @@ ModelImporter:
     400000: //RootNode
     2300000: //RootNode
     3300000: //RootNode
-    4300000: Cube
-    4300002: Spaceship
-    6400000: //RootNode
+    4300000: Door2
     7400000: Default Take
     9500000: //RootNode
   materials:
@@ -40,10 +38,10 @@ ModelImporter:
     lODScreenPercentages: []
     globalScale: 1
     meshCompression: 0
-    addColliders: 1
+    addColliders: 0
     importBlendShapes: 1
     swapUVChannels: 0
-    generateSecondaryUV: 1
+    generateSecondaryUV: 0
     useFileUnits: 1
     optimizeMeshForGPU: 1
     keepQuads: 0
