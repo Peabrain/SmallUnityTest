@@ -46,7 +46,7 @@ public class FirstPersonController : MonoBehaviour {
             velY = Time.deltaTime;
             if (Input.GetButtonDown("Jump"))
             {
-                velY = -jumpSpeed;
+//                velY = -jumpSpeed;
             }
         }
         Vector3 speed = new Vector3(slideSpeed, -velY, forwardSpeed);
