@@ -126,7 +126,7 @@ Light:
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 0.25
-    m_Bias: 0.1
+    m_Bias: 0.075
     m_NormalBias: 0.4
     m_NearPlane: 0.1
   m_Cookie: {fileID: 0}
@@ -202,7 +202,7 @@ Light:
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 0.75
-    m_Bias: 0
+    m_Bias: 0.075
     m_NormalBias: 0.4
     m_NearPlane: 0.1
   m_Cookie: {fileID: 0}
@@ -495,7 +495,7 @@ Light:
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 0.75
-    m_Bias: 0
+    m_Bias: 0.075
     m_NormalBias: 0.4
     m_NearPlane: 0.1
   m_Cookie: {fileID: 0}
@@ -1513,7 +1513,7 @@ Light:
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 0.75
-    m_Bias: 0
+    m_Bias: 0.075
     m_NormalBias: 0.4
     m_NearPlane: 0.1
   m_Cookie: {fileID: 0}
