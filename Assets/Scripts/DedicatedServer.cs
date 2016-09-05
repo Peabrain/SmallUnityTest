@@ -4,16 +4,18 @@ using UnityEngine.Networking;
 
 public class DedicatedServer : MonoBehaviour {
 
+    GameObject Ship1 = null;
     int status = 0;
 	// Use this for initialization
 	void Start () {
+        Ship1 = Instantiate(Resources.Load("Prefabs/Ship1", typeof(GameObject))) as GameObject;
         if (SystemInfo.graphicsDeviceID == 0)
         {
             SetupServer();
         }
 	}
     void Update() {
-        NetworkManager nm = transform.FindChild("Ship").GetComponent<NetworkManager>();
+        NetworkManager nm = Ship1.GetComponent<NetworkManager>();
         if (status == 1) {
             Debug.Log(nm.numPlayers);
             if (nm.numPlayers > 0)
@@ -31,7 +33,7 @@ public class DedicatedServer : MonoBehaviour {
         }
     }
     void SetupServer() {
-        transform.FindChild("Ship").GetComponent<NetworkManager>().StartServer();
+        Ship1.GetComponent<NetworkManager>().StartServer();
         status = 1;
     }	
 }
