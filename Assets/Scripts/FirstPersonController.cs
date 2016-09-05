@@ -16,8 +16,11 @@ public class FirstPersonController : MonoBehaviour {
     CharacterController characterController = null;
     // Use this for initialization
     void Start () {
-        if (myCamera != null)
+        if (myCamera != null) {
             myCamera.SetActive(true);
+ //           var head = transform.FindChild("Geo/Head");
+//            head.gameObject.SetActive(false);
+        }
         Cursor.visible = false;
         characterController = GetComponent<CharacterController>();
     }
