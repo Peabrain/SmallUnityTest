@@ -13,7 +13,7 @@ public class DedicatedServer : MonoBehaviour {
         }
 	}
     void Update() {
-        NetworkManager nm = GetComponent<NetworkManager>();
+        NetworkManager nm = transform.FindChild("Ship").GetComponent<NetworkManager>();
         if (status == 1) {
             Debug.Log(nm.numPlayers);
             if (nm.numPlayers > 0)
@@ -25,13 +25,13 @@ public class DedicatedServer : MonoBehaviour {
         if (status == 2)
         {
             if (nm.numPlayers == 0) {
-                GetComponent<NetworkManager>().StopServer();
+                nm.StopServer();
                 Application.Quit();
             }
         }
     }
     void SetupServer() {
-        GetComponent<NetworkManager>().StartServer();
+        transform.FindChild("Ship").GetComponent<NetworkManager>().StartServer();
         status = 1;
     }	
 }
