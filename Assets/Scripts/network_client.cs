@@ -14,10 +14,12 @@ namespace network_game
 {
 	public class CLIENT 
 	{
-		public bool isInit = false;
+        public int ingameContID = -1;
+        public bool isInit = false;
 		TcpClient client = null;
 	    NetworkStream theStream;
 		public bool ending = false;
+        DateTime Time = DateTime.Now;
 		// The port number for the remote device.  
 		public void StartClient(string servername,int port)
 		{
@@ -58,13 +60,56 @@ namespace network_game
 
         public void Update()
         {
-            List<byte[]> a = new List<byte[]>();
-            Receive(ref a);
-            if(a.Count > 0)
+            if (ingameContID != -1)
             {
-                Debug.Log("Get " + a.Count + " messages");
+                TimeSpan duration = DateTime.Now - Time;
+                if (duration > TimeSpan.FromSeconds(2))
+                {
+                    network_data.ping m = new network_data.ping();
+                    m.set(ingameContID);
+                    byte[] data = network_utils.nData.Instance.SerializeMsg<network_data.ping>(m);
+                    Send(data);
+                }
             }
+            List<byte[]> datas = new List<byte[]>();
+            Receive(ref datas);
+            if (datas.Count > 0)
+            {
+                foreach (byte[] data in datas)
+                {
+                    if (data.Length > 0)
+                    {
+                        Debug.Log(data.Length);
 
+                        network_utils.HEADER header = network_utils.nData.Instance.DeserializeMsg<network_utils.HEADER>(data);
+                        if (header.signum == network_utils.SIGNUM.BIN)
+                        {
+                            switch (header.command)
+                            {
+                                case (int)network_data.COMMANDS.cping:
+                                    {
+                                    }
+                                    break;
+                                case (int)network_data.COMMANDS.cset_ingame_param:
+                                    {
+                                        network_data.set_ingame_param m = network_utils.nData.Instance.DeserializeMsg<network_data.set_ingame_param>(data);
+                                        ingameContID = m.header.containerID;
+                                        //                                        m.playername = main.playername;
+                                        //                                       byte[] d = network_utils.nData.Instance.SerializeMsg<network_data.set_ingame_param>(m);
+                                        //                                      connect.Send(d);
+                                        Debug.Log(ingameContID);
+                                    }
+                                    break;
+                                default:
+                                    {
+                                        Debug.Log("nicht definiert");
+                                    }
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
         }
 
 		public void Receive(ref List<byte []> a)

@@ -53,6 +53,10 @@ namespace network_game
                 socketList.Add(new SocketData());
             }
         }
+        public int GetConnectedClients()
+        {
+            return socketUsedIDList.Count;
+        }
         public void StartListening(int port,int maxplayers)
         {
             try
@@ -85,6 +89,7 @@ namespace network_game
             socketFreeIDList.RemoveAt(0);
             socketList[id].socket = client;
             socketList[id].stream = client.GetStream();
+            socketList[id].setTime();
             socketUsedIDList.Add(id);
 
             network_data.set_ingame_param m = new set_ingame_param();
@@ -156,12 +161,12 @@ namespace network_game
             }
             return true;
         }
-        public void CheckPinkOut()
+        public void CheckPingOut()
         {
             for (int i = 0; i < socketUsedIDList.Count; i++)
             {
                 TimeSpan duration = DateTime.Now - socketList[socketUsedIDList[i]].time;
-                if (duration > TimeSpan.FromSeconds(20))
+                if (duration > TimeSpan.FromSeconds(10))
                 {
                     SocketData s = socketList[socketUsedIDList[i]];
                     s.del = true;
@@ -185,7 +190,7 @@ namespace network_game
                 int id = socketUsedIDList[delList[i]];
                 socketUsedIDList.RemoveAt(delList[i]);
                 socketFreeIDList.Add(id);
-                Debug.Log("Disconnect from Game");
+                Debug.Log("Disconnect from Game " + id);
             }
         }
         public void SetPing(int contID)
@@ -194,7 +199,7 @@ namespace network_game
         }
         public void Update()
         {
-            CheckPinkOut();
+            CheckPingOut();
             checkDel();
             List<network_utils.cl_data> back1 = new List<network_utils.cl_data>();
             back1.Clear();

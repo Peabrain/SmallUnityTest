@@ -58,6 +58,20 @@ public class DedicatedServer : MonoBehaviour
             //            GUI.Label(new Rect(2, 30, 150, 100), "Press B for both");
             GUI.Label(new Rect(2, 50, 150, 100), "Press C for client");
         }
+        else
+        {
+            if (server != null)
+            {
+                string s = "Server is running. (" + server.GetConnectedClients() + ")";
+                GUI.Label(new Rect(2, 10, 150, 100),s);
+            }
+            else
+            if (client != null)
+            {
+                GUI.Label(new Rect(2, 50, 150, 100), "ClientID " + client.ingameContID);
+                client.Update();
+            }
+        }
     }
 
     void Update()
