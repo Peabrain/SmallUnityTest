@@ -5,65 +5,95 @@ using System.Net;
 using System.Net.Sockets;
 using System.IO;
 using UnityEngine.Networking;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using System;
+using System.Text;
 
-/*public class DedicatedServer : MonoBehaviour
+public class DedicatedServer : MonoBehaviour
 {
-    private bool mRunning;
-    public static string msg = "";
-
-    public Thread mThread;
-    public TcpListener tcp_Listener = null;
-
-    void Awake()
-    {
-        mRunning = true;
-        ThreadStart ts = new ThreadStart(Receive);
-        mThread = new Thread(ts);
-        mThread.Start();
-        print("Thread done...");
-    }
-
-    public void stopListening()
-    {
-        mRunning = false;
-    }
-
-    void Receive()
-    {
-        tcp_Listener = new TcpListener(IPAddress.Parse("127.0.0.1"), 8001);
-        tcp_Listener.Start();
-        print("Server Start");
-        while (mRunning)
+    network_game.SERVER server = null;
+    network_game.CLIENT client = null;
+    private bool isAtStartup = true;
+    /*    public class SocketData
         {
-            // check if new connections are pending, if not, be nice and sleep 100ms
-            if (!tcp_Listener.Pending())
+            public SocketData()
             {
-                Thread.Sleep(100);
+                del = false;
+                time = new DateTime();
+                this.setTime();
             }
-            else
+            public void setTime()
             {
-                Socket ss = tcp_Listener.AcceptSocket();
-//                BonePos rec = new BonePos();
-//                byte[] tempbuffer = new byte[10000];
-//                ss.Receive(tempbuffer); // received byte array from client
-//                rec.AssignFromByteArray(tempbuffer); // my own datatype
+                time = DateTime.Now;
             }
+            public NetworkStream stream;
+            public TcpClient socket;
+            public DateTime time;
+            public bool del;
+            public string playername;
+        };
+
+        private bool mRunning;
+        public static string msg = "";
+        public int port = 40000;
+
+        public Thread mThread;
+        public TcpListener tcp_Listener = null;
+
+        List<SocketData> socketList= null;
+        List<int> socketFreeIDList = null;
+        List<int> socketUsedIDList = null;
+
+        TcpClient client = null;
+        */
+    void Start()
+    {
+    }
+    void OnGUI()
+    {
+        if (isAtStartup)
+        {
+            GUI.Label(new Rect(2, 10, 150, 100), "Press S for server");
+            //            GUI.Label(new Rect(2, 30, 150, 100), "Press B for both");
+            GUI.Label(new Rect(2, 50, 150, 100), "Press C for client");
         }
     }
 
     void Update()
     {
+        if (isAtStartup)
+        {
+            if (Input.GetKeyDown(KeyCode.S))
+            {
+                server = new network_game.SERVER();
+                server.StartListening(40000, 4);
+                isAtStartup = false;
+            }
 
-    }
-
-    void OnApplicationQuit()
-    { // stop listening thread
-        stopListening();// wait for listening thread to terminate (max. 500ms)
-        mThread.Join(500);
+            if (Input.GetKeyDown(KeyCode.C))
+            {
+                client = new network_game.CLIENT();
+                client.StartClient("localhost", 40000);
+                //                StartClient();
+                isAtStartup = false;
+            }
+        }
+        else
+        {
+            if(server != null)
+            {
+                server.Update();
+            }
+            else
+            if (client != null)
+            {
+                client.Update();
+            }
+        }
     }
 }
-/**/
-
+/*
 public class DedicatedServer : MonoBehaviour {
 
     GameObject Ship1 = null;
@@ -99,3 +129,5 @@ public class DedicatedServer : MonoBehaviour {
         status = 1;
     }	
 }
+/**/
+ 

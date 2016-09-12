@@ -67,6 +67,10 @@
     <Compile Include="Assets\Scripts\Door.cs" />
     <Compile Include="Assets\Scripts\FirstPersonController.cs" />
     <Compile Include="Assets\Scripts\SetupLocalPlayer.cs" />
+    <Compile Include="Assets\Scripts\network_client.cs" />
+    <Compile Include="Assets\Scripts\network_data.cs" />
+    <Compile Include="Assets\Scripts\network_server.cs" />
+    <Compile Include="Assets\Scripts\network_utils.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
 </Project>
