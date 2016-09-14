@@ -63,10 +63,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\DedicatedServer.cs" />
     <Compile Include="Assets\Scripts\Door.cs" />
     <Compile Include="Assets\Scripts\FirstPersonController.cs" />
-    <Compile Include="Assets\Scripts\SetupLocalPlayer.cs" />
+    <Compile Include="Assets\Scripts\channel.cs" />
     <Compile Include="Assets\Scripts\client.cs" />
     <Compile Include="Assets\Scripts\game.cs" />
     <Compile Include="Assets\Scripts\gui.cs" />

@@ -86,12 +86,13 @@ public class server : network {
             SetPing(bb.containerID);
             switch (header.command)
             {
-                case (int)network_data.COMMANDS.cend_ingame:
+/*                case (int)network_data.COMMANDS.cend_ingame:
                     {
                         network_data.end_ingame com = network_utils.nData.Instance.DeserializeMsg<network_data.end_ingame>(bb.data);
                         socketList[com.header.containerID].del = true;
                     }
                     break;
+*/
                 case (int)network_data.COMMANDS.cping:
                     {
                         network_data.ping com = network_utils.nData.Instance.DeserializeMsg<network_data.ping>(bb.data);
@@ -103,7 +104,11 @@ public class server : network {
                         socketList[com.header.containerID].playername = com.playername;
                     }
                     break;
-                default: GetComponent<game>().ProcessMessage(ref bb.data);
+                default:
+                    {
+                        channel c = ChannelObjectList[header.channelID].GetComponent<channel>();
+                        c.ProcessMessage(ref bb.data);
+                    }
                     break;
             }
         }
@@ -150,7 +155,8 @@ public class server : network {
         socketUsedIDList.Add(id);
 
         network_data.set_ingame_param m = new set_ingame_param();
-        m.set(id);
+        m.set(id,0);
+        m.shipchannel = 1;
         byte[] data = network_utils.nData.Instance.SerializeMsg<network_data.set_ingame_param>(m);
         Send(id, data);
 

@@ -22,6 +22,8 @@ public class gui : MonoBehaviour {
                 go.name = "game";
                 go.AddComponent<game>();
                 go.AddComponent<server>();
+                network n = go.GetComponent<network>();
+                n.AddGameObjectToChannel(go);
                 go.GetComponent<game>().LoadShip("Prefabs/Ship1", "Ship");
                 isAtStartup = false;
             }
@@ -32,6 +34,8 @@ public class gui : MonoBehaviour {
                 go.name = "game";
                 go.AddComponent<game>();
                 go.AddComponent<client>();
+                network n = go.GetComponent<network>();
+                n.AddGameObjectToChannel(go);
                 go.GetComponent<game>().LoadShip("Prefabs/Ship1", "Ship");
                 isAtStartup = false;
             }

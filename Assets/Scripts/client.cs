@@ -31,7 +31,7 @@ public class client : network {
             if (duration > TimeSpan.FromSeconds(2))
             {
                 network_data.ping m = new network_data.ping();
-                m.set(ingameContID);
+                m.set(ingameContID,0);
                 byte[] data = network_utils.nData.Instance.SerializeMsg<network_data.ping>(m);
                 Send(ingameContID,data);
             }
@@ -63,7 +63,8 @@ public class client : network {
                                     //                                      connect.Send(d);
 
                                     network_data.enter_ship s = new network_data.enter_ship();
-                                    s.set(ingameContID);
+                                    s.set(ingameContID,1);
+                                    s.shipchannel = m.shipchannel;
                                     byte[] data1 = network_utils.nData.Instance.SerializeMsg<network_data.enter_ship>(s);
                                     Send(ingameContID, data1);
 
@@ -71,7 +72,10 @@ public class client : network {
                                 }
                                 break;
                             default:
-                                GetComponent<game>().ProcessMessage(ref data);
+                                {
+                                    channel c = ChannelObjectList[header.channelID].GetComponent<channel>();
+                                    c.ProcessMessage(ref data);
+                                }
                                 break;
                         }
                     }

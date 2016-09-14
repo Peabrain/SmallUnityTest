@@ -23,6 +23,11 @@ namespace network_utils
             get { return ContainerID; }
             set { ContainerID = value; }
         }
+        public int channelID
+        {
+            get { return ChannelID; }
+            set { ChannelID = value; }
+        }
         public int command
         {
             get { return Command; }
@@ -37,6 +42,7 @@ namespace network_utils
         private SIGNUM Signum;
         private int Command;
         private int ContainerID;
+        private int ChannelID;
         private int Size;
     }
 

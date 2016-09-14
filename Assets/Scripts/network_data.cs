@@ -9,27 +9,27 @@ using network_utils;
 namespace network_data
 {  
 	public enum COMMANDS { 
-        clogin_ask = 1,                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
-        clogin_anser = 2, 
+//        clogin_ask = 1,                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
+//        clogin_anser = 2, 
         cping = 3,
-        center_lobby = 4,
-        cleave_lobby = 5,
-        csesson_create = 6,
-        csesson_delete = 7,
-        csesson_enter = 8,
-        cstart_session = 9,
-        cstarted_session = 10,
-		cend_ingame = 11,
+//        center_lobby = 4,
+//        cleave_lobby = 5,
+//        csesson_create = 6,
+//        csesson_delete = 7,
+//        csesson_enter = 8,
+//        cstart_session = 9,
+//        cstarted_session = 10,
+//		cend_ingame = 11,
         cset_ingame_param = 12,
         center_ship = 13,
         ccreate_player = 14,
         cmove_player = 15
     };
 
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+/*    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct login_ask
     {
-        public void set(int contID, string name, string password)
+        public void set(int contID,int channel, string name, string password)
         {
             HEADER h = new HEADER();
             h.command = (int)COMMANDS.clogin_ask;
@@ -88,15 +88,17 @@ namespace network_data
         private HEADER Header;
         private bool Logged_in;
     }
+*/
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct ping
     {
-        public void set(int contID)
+        public void set(int contID, int channel)
         {
             HEADER h = new HEADER();
             h.command = (int)COMMANDS.cping;
             h.signum = SIGNUM.BIN;
             h.containerID = contID;
+            h.channelID = channel;
             h.size = network_utils.nData.Instance.getSize<ping>();
             header = h;
         }
@@ -107,7 +109,7 @@ namespace network_data
         }
         private HEADER Header;
     }
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+/*    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct enter_lobby
     {
         public void set(int contID)
@@ -170,7 +172,6 @@ namespace network_data
         private HEADER Header;
         private network_lobby.SESSION_DATA Data;
     }
-*/
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct session_delete
     {
@@ -295,15 +296,17 @@ namespace network_data
         }
         private HEADER Header;
     }
+*/
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct set_ingame_param
     {
-        public void set(int contID)
+        public void set(int contID, int channel)
         {
             HEADER h = new HEADER();
             h.command = (int)COMMANDS.cset_ingame_param;
             h.signum = SIGNUM.BIN;
             h.containerID = contID;
+            h.channelID = channel;
             h.size = network_utils.nData.Instance.getSize<set_ingame_param>();
             header = h;
         }
@@ -317,19 +320,26 @@ namespace network_data
             get { return Playername; }
             set { Playername = value; }
         }
+        public int shipchannel
+        {
+            get { return ShipChannel; }
+            set { ShipChannel = value; }
+        }
         private HEADER Header;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
         private string Playername;
+        private int ShipChannel;
     }
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct enter_ship
     {
-        public void set(int contID)
+        public void set(int contID, int channel)
         {
             HEADER h = new HEADER();
             h.command = (int)COMMANDS.center_ship;
             h.signum = SIGNUM.BIN;
             h.containerID = contID;
+            h.channelID = channel;
             h.size = network_utils.nData.Instance.getSize<enter_ship>();
             header = h;
         }
@@ -343,18 +353,25 @@ namespace network_data
             get { return Channel; }
             set { Channel = value; }
         }
+        public int shipchannel
+        {
+            get { return ShipChannel; }
+            set { ShipChannel = value; }
+        }
         private HEADER Header;
         private int Channel;
+        private int ShipChannel;
     }
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct create_player
     {
-        public void set(int contID)
+        public void set(int contID, int channel)
         {
             HEADER h = new HEADER();
             h.command = (int)COMMANDS.ccreate_player;
             h.signum = SIGNUM.BIN;
             h.containerID = contID;
+            h.channelID = channel;
             h.size = network_utils.nData.Instance.getSize<create_player>();
             header = h;
         }
@@ -387,12 +404,13 @@ namespace network_data
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct move_player
     {
-        public void set(int contID)
+        public void set(int contID,int channel)
         {
             HEADER h = new HEADER();
             h.command = (int)COMMANDS.ccreate_player;
             h.signum = SIGNUM.BIN;
             h.containerID = contID;
+            h.channelID = channel;
             h.size = network_utils.nData.Instance.getSize<create_player>();
             header = h;
         }
