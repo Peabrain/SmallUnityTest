@@ -59,8 +59,12 @@ public class server : network {
 
     }
 
-	
-	public void OnGUI()
+    public override bool IsClient()
+    {
+        return false;
+    }
+
+    public void OnGUI()
     {
         string s = "Server is running. (" + GetConnectedClients() + ")";
         GUI.Label(new Rect(2, 10, 150, 100), s);
@@ -69,10 +73,10 @@ public class server : network {
 	void Update () {
         CheckPingOut();
         checkDel();
-        List<network_utils.cl_data> back1 = new List<network_utils.cl_data>();
-        back1.Clear();
-        Receive(ref back1);
-        foreach (network_utils.cl_data bb in back1)
+        List<network_utils.cl_data> messages = new List<network_utils.cl_data>();
+        messages.Clear();
+        Receive(ref messages);
+        foreach (network_utils.cl_data bb in messages)
         {
             int count = 0;
             bb.data.CopyTo(bb.data, count);
@@ -98,6 +102,8 @@ public class server : network {
                         network_data.set_ingame_param com = network_utils.nData.Instance.DeserializeMsg<network_data.set_ingame_param>(bb.data);
                         socketList[com.header.containerID].playername = com.playername;
                     }
+                    break;
+                default: GetComponent<game>().ProcessMessage(ref bb.data);
                     break;
             }
         }

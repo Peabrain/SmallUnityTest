@@ -1,3 +1,4 @@
+using UnityEngine;
 using System.Collections;
 using System;
 using System.Collections.Generic;
@@ -20,7 +21,9 @@ namespace network_data
         cstarted_session = 10,
 		cend_ingame = 11,
         cset_ingame_param = 12,
-        cload_ship = 13
+        center_ship = 13,
+        ccreate_player = 14,
+        cmove_player = 15
     };
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -319,15 +322,15 @@ namespace network_data
         private string Playername;
     }
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct load_ship
+    public struct enter_ship
     {
         public void set(int contID)
         {
             HEADER h = new HEADER();
-            h.command = (int)COMMANDS.cset_ingame_param;
+            h.command = (int)COMMANDS.center_ship;
             h.signum = SIGNUM.BIN;
             h.containerID = contID;
-            h.size = network_utils.nData.Instance.getSize<set_ingame_param>();
+            h.size = network_utils.nData.Instance.getSize<enter_ship>();
             header = h;
         }
         public HEADER header
@@ -335,13 +338,87 @@ namespace network_data
             get { return Header; }
             set { Header = value; }
         }
-        public string prefab
+        public int channel
         {
-            get { return Prefab; }
-            set { Prefab = value; }
+            get { return Channel; }
+            set { Channel = value; }
         }
         private HEADER Header;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)]
-        private string Prefab;
+        private int Channel;
+    }
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct create_player
+    {
+        public void set(int contID)
+        {
+            HEADER h = new HEADER();
+            h.command = (int)COMMANDS.ccreate_player;
+            h.signum = SIGNUM.BIN;
+            h.containerID = contID;
+            h.size = network_utils.nData.Instance.getSize<create_player>();
+            header = h;
+        }
+        public HEADER header
+        {
+            get { return Header; }
+            set { Header = value; }
+        }
+        public string playername
+        {
+            get { return Playername; }
+            set { Playername = value; }
+        }
+        public int spawnpoint
+        {
+            get { return Spawnpoint; }
+            set { Spawnpoint = value; }
+        }
+        public int channel
+        {
+            get { return Channel; }
+            set { Channel = value; }
+        }
+        private HEADER Header;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
+        private string Playername;
+        private int Spawnpoint;
+        private int Channel;
+    }
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct move_player
+    {
+        public void set(int contID)
+        {
+            HEADER h = new HEADER();
+            h.command = (int)COMMANDS.ccreate_player;
+            h.signum = SIGNUM.BIN;
+            h.containerID = contID;
+            h.size = network_utils.nData.Instance.getSize<create_player>();
+            header = h;
+        }
+        public HEADER header
+        {
+            get { return Header; }
+            set { Header = value; }
+        }
+        public Vector3 position
+        {
+            get { return Position; }
+            set { Position = value; }
+        }
+        public Quaternion rotation
+        {
+            get { return Rotation; }
+            set { Rotation = value; }
+        }
+        public int channel
+        {
+            get { return Channel; }
+            set { Channel = value; }
+        }
+        private HEADER Header;
+        private Vector3 Position;
+        private Quaternion Rotation;
+        private int Channel;
     }
 }

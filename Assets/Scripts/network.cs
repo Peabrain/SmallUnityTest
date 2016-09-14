@@ -10,16 +10,14 @@ using System.Runtime.InteropServices;
 using System;
 using System.Text;
 
-public abstract class network : MonoBehaviour {
+public class network : MonoBehaviour {
 
-    void Awake()
+    public virtual bool Send(int contID, byte[] byteData)
     {
-        //      DontDestroyOnLoad(transform.gameObject);
+        return false;
     }
-
-    void Start()
+    public virtual bool IsClient()
     {
+        return false;
     }
-
-    public abstract bool Send(int contID, byte[] byteData);
 }

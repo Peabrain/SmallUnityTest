@@ -5,8 +5,6 @@ public class gui : MonoBehaviour {
 
     // Use this for initialization
     private bool isAtStartup = true;
-    public GameObject network = null;
-    public GameObject game = null;
     void Awake()
     {
     }
@@ -16,21 +14,25 @@ public class gui : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        if (isAtStartup && network != null)
+        if (isAtStartup)
         {
             if (Input.GetKeyDown(KeyCode.S))
             {
                 var go = new GameObject();
-                go.name = "networking";
+                go.name = "game";
+                go.AddComponent<game>();
                 go.AddComponent<server>();
+                go.GetComponent<game>().LoadShip("Prefabs/Ship1", "Ship");
                 isAtStartup = false;
             }
 
             if (Input.GetKeyDown(KeyCode.C))
             {
                 var go = new GameObject();
-                go.name = "networking";
+                go.name = "game";
+                go.AddComponent<game>();
                 go.AddComponent<client>();
+                go.GetComponent<game>().LoadShip("Prefabs/Ship1", "Ship");
                 isAtStartup = false;
             }
         }

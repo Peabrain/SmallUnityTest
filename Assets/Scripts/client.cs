@@ -11,7 +11,7 @@ using System.IO;
 
 public class client : network {
 
-    int ingameContID = -1;
+    public int ingameContID = -1;
     public bool isInit = false;
     TcpClient myclient = null;
     NetworkStream theStream;
@@ -40,12 +40,11 @@ public class client : network {
         Receive(ref datas);
         if (datas.Count > 0)
         {
-            foreach (byte[] data in datas)
+            for (int i = 0;i < datas.Count;i++)
             {
+                byte[] data = datas[i];
                 if (data.Length > 0)
                 {
-                    Debug.Log(data.Length);
-
                     network_utils.HEADER header = network_utils.nData.Instance.DeserializeMsg<network_utils.HEADER>(data);
                     if (header.signum == network_utils.SIGNUM.BIN)
                     {
@@ -62,13 +61,17 @@ public class client : network {
                                     //                                        m.playername = main.playername;
                                     //                                       byte[] d = network_utils.nData.Instance.SerializeMsg<network_data.set_ingame_param>(m);
                                     //                                      connect.Send(d);
+
+                                    network_data.enter_ship s = new network_data.enter_ship();
+                                    s.set(ingameContID);
+                                    byte[] data1 = network_utils.nData.Instance.SerializeMsg<network_data.enter_ship>(s);
+                                    Send(ingameContID, data1);
+
                                     Debug.Log(ingameContID);
                                 }
                                 break;
                             default:
-                                {
-                                    Debug.Log("nicht definiert");
-                                }
+                                GetComponent<game>().ProcessMessage(ref data);
                                 break;
                         }
                     }
@@ -173,5 +176,9 @@ public class client : network {
         }
         string password = s.ToString();
         return password;
+    }
+    public override bool IsClient()
+    {
+        return true;
     }
 }
