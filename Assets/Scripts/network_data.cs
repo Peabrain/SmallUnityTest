@@ -385,20 +385,26 @@ namespace network_data
             get { return Playername; }
             set { Playername = value; }
         }
-        public int spawnpoint
-        {
-            get { return Spawnpoint; }
-            set { Spawnpoint = value; }
-        }
         public int channel
         {
             get { return Channel; }
             set { Channel = value; }
         }
+        public Vector3 position
+        {
+            get { return Position; }
+            set { Position = value; }
+        }
+        public Quaternion rotation
+        {
+            get { return Rotation; }
+            set { Rotation = value; }
+        }
         private HEADER Header;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
         private string Playername;
-        private int Spawnpoint;
+        private Vector3 Position;
+        private Quaternion Rotation;
         private int Channel;
     }
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
