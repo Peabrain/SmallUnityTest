@@ -9,11 +9,34 @@ public class ship : channel {
 	// Use this for initialization
 	void Start () {
 	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (mynetwork.IsClient() == false)
+        {
+            network_data.move_player m = new network_data.move_player();
+            foreach (KeyValuePair<int, GameObject> i in entity)
+            {
+                m.set(i.Key, number);
+                m.position = i.Value.transform.position;
+                m.rotation = i.Value.transform.rotation;
+                byte[] data1 = network_utils.nData.Instance.SerializeMsg<network_data.move_player>(m);
+                SendToChannel(ref data1);
+            }
+        }
+        else
+        {
+            network_data.move_player m = new network_data.move_player();
+            int id = mynetwork.GetComponent<client>().ingameContID;
+            m.set(id, number);
+            GameObject g = entity[id];
+            m.position = g.transform.position;
+            m.rotation = g.transform.rotation;
+            byte[] data1 = network_utils.nData.Instance.SerializeMsg<network_data.move_player>(m);
+            mynetwork.Send(id, data1);
+        }
+    }
     GameObject GetNextSpawnPoint()
     {
         int s = spos;
@@ -39,7 +62,6 @@ public class ship : channel {
         {
             network_data.create_player m = new network_data.create_player();
             m.set(contID, number);
-            m.channel = number;
             m.position = position;
             m.rotation = rotation;
             byte[] data = network_utils.nData.Instance.SerializeMsg<network_data.create_player>(m);
@@ -79,7 +101,27 @@ public class ship : channel {
                     network_data.create_player com = network_utils.nData.Instance.DeserializeMsg<network_data.create_player>(message);
                     if (mynetwork.IsClient() == true)
                     {
-                        SpawnPlayer(com.header.containerID, mynetwork.IsClient(), mynetwork.GetComponent<client>().ingameContID == com.header.containerID, com.position,com.rotation);
+                        SpawnPlayer(com.header.containerID, mynetwork.IsClient(), mynetwork.GetComponent<client>().ingameContID == com.header.containerID, com.position, com.rotation);
+                    }
+                }
+                break;
+            case (int)network_data.COMMANDS.cmove_player:
+                {
+                    network_data.move_player com = network_utils.nData.Instance.DeserializeMsg<network_data.move_player>(message);
+                    if (mynetwork.IsClient())
+                    {
+                        if (mynetwork.GetComponent<client>().ingameContID != com.header.containerID)
+                        {
+                            GameObject g = entity[com.header.containerID];
+                            g.transform.position = com.position;
+                            g.transform.rotation = com.rotation;
+                        }
+                    }
+                    else
+                    {
+                        GameObject g = entity[com.header.containerID];
+                        g.transform.position = com.position;
+                        g.transform.rotation = com.rotation;
                     }
                 }
                 break;

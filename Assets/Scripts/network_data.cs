@@ -385,11 +385,6 @@ namespace network_data
             get { return Playername; }
             set { Playername = value; }
         }
-        public int channel
-        {
-            get { return Channel; }
-            set { Channel = value; }
-        }
         public Vector3 position
         {
             get { return Position; }
@@ -405,7 +400,6 @@ namespace network_data
         private string Playername;
         private Vector3 Position;
         private Quaternion Rotation;
-        private int Channel;
     }
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct move_player
@@ -413,11 +407,11 @@ namespace network_data
         public void set(int contID,int channel)
         {
             HEADER h = new HEADER();
-            h.command = (int)COMMANDS.ccreate_player;
+            h.command = (int)COMMANDS.cmove_player;
             h.signum = SIGNUM.BIN;
             h.containerID = contID;
             h.channelID = channel;
-            h.size = network_utils.nData.Instance.getSize<create_player>();
+            h.size = network_utils.nData.Instance.getSize<move_player>();
             header = h;
         }
         public HEADER header
@@ -435,14 +429,8 @@ namespace network_data
             get { return Rotation; }
             set { Rotation = value; }
         }
-        public int channel
-        {
-            get { return Channel; }
-            set { Channel = value; }
-        }
         private HEADER Header;
         private Vector3 Position;
         private Quaternion Rotation;
-        private int Channel;
     }
 }
