@@ -15,7 +15,7 @@ public class ship : channel {
     {
         if (mynetwork.IsClient() == false)
         {
-            network_data.move_player m = new network_data.move_player();
+/*            network_data.move_player m = new network_data.move_player();
             foreach (KeyValuePair<int, GameObject> i in entity)
             {
                 m.set(i.Key, number);
@@ -24,7 +24,7 @@ public class ship : channel {
                 byte[] data1 = network_utils.nData.Instance.SerializeMsg<network_data.move_player>(m);
                 SendToChannel(ref data1);
             }
-        }
+  */      }
         else
         {
             network_data.move_player m = new network_data.move_player();
@@ -53,8 +53,11 @@ public class ship : channel {
         {
             Transform t = Player.transform.FindChild("Camera");
             t.gameObject.SetActive(true);
-            FirstPersonController f = Player.GetComponent<FirstPersonController>();
-            f.enabled = true;
+            Player.AddComponent<FirstPersonController>();
+        }
+        else
+        {
+            Player.AddComponent<puppet>();
         }
         if (Player) Debug.Log("Enter Ship (" + number + ")" + " player " + contID + " pos: " + position +" rot:" + rotation);
 
@@ -111,17 +114,32 @@ public class ship : channel {
                     if (mynetwork.IsClient())
                     {
                         if (mynetwork.GetComponent<client>().ingameContID != com.header.containerID)
-                        {
-                            GameObject g = entity[com.header.containerID];
-                            g.transform.position = com.position;
-                            g.transform.rotation = com.rotation;
+                        {                           
+                            if(entity.ContainsKey(com.header.containerID))
+                            {
+                                GameObject g = entity[com.header.containerID];
+                                g.transform.position = com.position;
+                                g.transform.rotation = com.rotation;
+                            }
                         }
                     }
                     else
                     {
-                        GameObject g = entity[com.header.containerID];
-                        g.transform.position = com.position;
-                        g.transform.rotation = com.rotation;
+                        if (entity.ContainsKey(com.header.containerID))
+                        {
+                            GameObject g = entity[com.header.containerID];
+                            g.transform.position = com.position;
+                            g.transform.rotation = com.rotation;
+                            network_data.move_player m = new network_data.move_player();
+                            foreach (KeyValuePair<int, GameObject> i in entity)
+                            {
+                                m.set(i.Key, number);
+                                m.position = i.Value.transform.position;
+                                m.rotation = i.Value.transform.rotation;
+                                byte[] data1 = network_utils.nData.Instance.SerializeMsg<network_data.move_player>(m);
+                                SendToChannel(ref data1);
+                            }
+                        }
                     }
                 }
                 break;

@@ -73,8 +73,11 @@ public class client : network {
                                 break;
                             default:
                                 {
-                                    channel c = ChannelObjectList[header.channelID].GetComponent<channel>();
-                                    c.ProcessMessage(ref data);
+                                    if(ChannelObjectList.ContainsKey(header.channelID))
+                                    {
+                                        channel c = ChannelObjectList[header.channelID].GetComponent<channel>();
+                                        c.ProcessMessage(ref data);
+                                    }
                                 }
                                 break;
                         }

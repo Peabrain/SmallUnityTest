@@ -64,7 +64,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Door.cs" />
-    <Compile Include="Assets\Scripts\FirstPersonController.cs" />
     <Compile Include="Assets\Scripts\channel.cs" />
     <Compile Include="Assets\Scripts\client.cs" />
     <Compile Include="Assets\Scripts\game.cs" />
@@ -72,6 +71,8 @@
     <Compile Include="Assets\Scripts\network.cs" />
     <Compile Include="Assets\Scripts\network_data.cs" />
     <Compile Include="Assets\Scripts\network_utils.cs" />
+    <Compile Include="Assets\Scripts\puppet.cs" />
+    <Compile Include="Assets\Scripts\puppetcontrol.cs" />
     <Compile Include="Assets\Scripts\server.cs" />
     <Compile Include="Assets\Scripts\ship.cs" />
   </ItemGroup>

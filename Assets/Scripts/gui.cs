@@ -7,10 +7,25 @@ public class gui : MonoBehaviour {
     private bool isAtStartup = true;
     void Awake()
     {
+        string[] sys = System.Environment.GetCommandLineArgs();
+        foreach(string s in sys)
+        {
+            if (s == "-batchmode")
+            {
+                var go = new GameObject();
+                go.name = "game";
+                go.AddComponent<game>();
+                go.AddComponent<server>();
+                network n = go.GetComponent<network>();
+                n.AddGameObjectToChannel(go);
+                go.GetComponent<game>().LoadShip("Prefabs/Ship1", "Ship");
+                isAtStartup = false;
+                break;
+            }
+        }
     }
     void Start () {
-	
-	}
+    }
 	
 	// Update is called once per frame
 	void Update () {

@@ -42,4 +42,8 @@ public class game : channel {
     {
 
     }
+    void PlayerControl()
+    {
+
+    }
 }
