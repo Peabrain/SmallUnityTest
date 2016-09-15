@@ -429,8 +429,14 @@ namespace network_data
             get { return Rotation; }
             set { Rotation = value; }
         }
+        public Vector3 speed
+        {
+            get { return Speed; }
+            set { Speed = value; }
+        }
         private HEADER Header;
         private Vector3 Position;
         private Quaternion Rotation;
+        private Vector3 Speed;
     }
 }

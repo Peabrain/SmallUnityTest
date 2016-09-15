@@ -10,7 +10,8 @@ public class puppet : MonoBehaviour {
     public float jumpSpeed = 2.0f;
 
     internal float velY = 0.0f;
-    Vector3 speed = new Vector3(0, 0, 0);
+    public Vector3 speed = new Vector3(0, 0, 0);
+    Vector3 old_speed = new Vector3(0, 0, 0);
     public bool speed_change = false;
 
     internal float rotX = 0;
@@ -32,8 +33,6 @@ public class puppet : MonoBehaviour {
     // Update is called once per frame
     void Update()
     {
-
-        SetMovementSpeed(Control());
         if (characterController != null)
         {
             characterController.Move(speed * Time.deltaTime);
@@ -41,7 +40,12 @@ public class puppet : MonoBehaviour {
     }
     public void SetMovementSpeed(Vector3 s)
     {
+        old_speed = speed;
         speed = s;
+        if (old_speed == speed)
+            speed_change = false;
+        else
+            speed_change = true;
     }
     public  virtual Vector3 Control()
     {

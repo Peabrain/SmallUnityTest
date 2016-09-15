@@ -3,6 +3,15 @@ using System.Collections;
 
 public class FirstPersonController : puppet {
 
+    // Update is called once per frame
+    void Update()
+    {
+        SetMovementSpeed(Control());
+        if (characterController != null)
+        {
+            characterController.Move(speed * Time.deltaTime);
+        }
+    }
     public override Vector3 Control()
     {
         // Rotation
