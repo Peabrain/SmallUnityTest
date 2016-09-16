@@ -12,6 +12,26 @@ using System.Text;
 
 public class network : MonoBehaviour {
 
+    public class SocketData
+    {
+        public SocketData()
+        {
+            del = false;
+            time = new DateTime();
+            this.setTime();
+        }
+        public void setTime()
+        {
+            time = DateTime.Now;
+        }
+        public NetworkStream stream;
+        public TcpClient socket;
+        public DateTime time;
+        public bool del;
+        public string playername;
+        public List<int> channels = new List<int>();
+    };
+
     internal Dictionary<int, GameObject> ChannelObjectList = new Dictionary<int, GameObject>();
     int nextchannel = 0;
 
@@ -29,5 +49,13 @@ public class network : MonoBehaviour {
     public virtual bool IsClient()
     {
         return false;
+    }
+    public virtual void RegisterChannelToSocketdata(int contID, int channel)
+    {
+
+    }
+    public virtual void UnregisterChannelToSocketdata(int contID, int channel)
+    {
+
     }
 }

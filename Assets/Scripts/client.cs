@@ -13,21 +13,19 @@ public class client : network {
 
     public int ingameContID = -1;
     public bool isInit = false;
-    TcpClient myclient = null;
-    NetworkStream theStream;
     public bool ending = false;
-    DateTime Time = DateTime.Now;
     public int port = 40000;
+    SocketData socketdata = new SocketData();
     // Use this for initialization
     void Start () {
-        StartClient("localhost", port);
+        StartClient("192.168.1.16", port);
     }
 	
 	// Update is called once per frame
 	void Update () {
         if (ingameContID != -1)
         {
-            TimeSpan duration = DateTime.Now - Time;
+            TimeSpan duration = DateTime.Now - socketdata.time;
             if (duration > TimeSpan.FromSeconds(2))
             {
                 network_data.ping m = new network_data.ping();
@@ -95,9 +93,9 @@ public class client : network {
     {
         try
         {
-            myclient = new TcpClient(servername, port);
-            theStream = myclient.GetStream();
-            if (myclient == null)
+            socketdata.socket = new TcpClient(servername, port);
+            socketdata.stream = socketdata.socket.GetStream();
+            if (socketdata.socket == null)
             {
                 ending = true;
             }
@@ -115,10 +113,10 @@ public class client : network {
     {
         try
         {
-            if (myclient != null)
+            if (socketdata.socket != null)
             {
-                myclient.GetStream().Close();
-                myclient.Close();
+                socketdata.stream.Close();
+                socketdata.socket.Close();
             }
         }
         catch (Exception e)
@@ -128,20 +126,20 @@ public class client : network {
     }
     void Receive(ref List<byte[]> a)
     {
-        if (theStream == null) return;
-        while (theStream.DataAvailable)
+        if (socketdata.stream == null) return;
+        while (socketdata.stream.DataAvailable)
         {
             try
             {
                 byte[] recieve = new Byte[8192];
-                int len = theStream.Read(recieve, 0, network_utils.nData.Instance.getSize<network_utils.HEADER>());
+                int len = socketdata.stream.Read(recieve, 0, network_utils.nData.Instance.getSize<network_utils.HEADER>());
                 network_utils.HEADER header = network_utils.nData.Instance.DeserializeMsg<network_utils.HEADER>(recieve);
                 if (header.signum == network_utils.SIGNUM.BIN)
                 {
                     int restlaenge = header.size - network_utils.nData.Instance.getSize<network_utils.HEADER>();
                     if (restlaenge > 0)
                     {
-                        len += theStream.Read(recieve, network_utils.nData.Instance.getSize<network_utils.HEADER>(), restlaenge);
+                        len += socketdata.stream.Read(recieve, network_utils.nData.Instance.getSize<network_utils.HEADER>(), restlaenge);
                     }
                 }
                 else
@@ -162,7 +160,7 @@ public class client : network {
     {
         try
         {
-            theStream.Write(byteData, 0, byteData.Count());
+            socketdata.stream.Write(byteData, 0, byteData.Count());
         }
         catch (Exception e)
         {
@@ -187,5 +185,13 @@ public class client : network {
     public override bool IsClient()
     {
         return true;
+    }
+    public override void RegisterChannelToSocketdata(int contID, int channel)
+    {
+        socketdata.channels.Add(channel);
+    }
+    public override void UnregisterChannelToSocketdata(int contID, int channel)
+    {
+        socketdata.channels.Remove(channel);
     }
 }

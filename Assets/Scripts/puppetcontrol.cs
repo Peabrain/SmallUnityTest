@@ -3,7 +3,18 @@ using System.Collections;
 
 public class FirstPersonController : puppet {
 
+    public GameObject myCamera = null;
     // Update is called once per frame
+    void Awake()
+    {
+        myCamera = transform.FindChild("Camera").gameObject;
+        if (myCamera != null)
+        {
+            myCamera.SetActive(true);
+            //           var head = transform.FindChild("Geo/Head");
+            //            head.gameObject.SetActive(false);
+        }
+    }
     void Update()
     {
         SetMovementSpeed(Control());

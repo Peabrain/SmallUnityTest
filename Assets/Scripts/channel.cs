@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class channel : MonoBehaviour
 {
 
-    internal Dictionary<int, GameObject> entity = new Dictionary<int, GameObject>();
+    Dictionary<int, GameObject> entities = new Dictionary<int, GameObject>();
     public network mynetwork = null;
     public int number = -1;
     // Use this for initialization
@@ -33,10 +33,33 @@ public class channel : MonoBehaviour
     }
     public bool SendToChannel(ref byte[] byteData)
     {
-        foreach(KeyValuePair<int,GameObject> i in entity)
+        foreach(KeyValuePair<int,GameObject> i in entities)
         {
             mynetwork.Send(i.Key,byteData);
         }
         return true;
+    }
+    internal void RegisterEntity(GameObject g, int contID)
+    {
+        entities[contID] = g;
+        mynetwork.RegisterChannelToSocketdata(contID, number);
+    }
+    internal virtual void UnregisterEntity(int contID)
+    {
+        if(entities.ContainsKey(contID))
+        {
+            entities.Remove(contID);
+        }
+        mynetwork.UnregisterChannelToSocketdata(contID, number);
+    }
+    internal GameObject GetEntity(int contID)
+    {
+        if (entities.ContainsKey(contID))
+            return entities[contID];
+        return null;
+    }
+    internal IDictionaryEnumerator FirstEntity()
+    {
+        return entities.GetEnumerator();
     }
 }

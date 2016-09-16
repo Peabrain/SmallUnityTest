@@ -23,7 +23,8 @@ namespace network_data
         cset_ingame_param = 12,
         center_ship = 13,
         ccreate_player = 14,
-        cmove_player = 15
+        cmove_player = 15,
+        cdisconnect = 16
     };
 
 /*    [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -404,7 +405,7 @@ namespace network_data
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct move_player
     {
-        public void set(int contID,int channel)
+        public void set(int contID, int channel)
         {
             HEADER h = new HEADER();
             h.command = (int)COMMANDS.cmove_player;
@@ -438,5 +439,25 @@ namespace network_data
         private Vector3 Position;
         private Quaternion Rotation;
         private Vector3 Speed;
+    }
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct disconnect
+    {
+        public void set(int contID, int channel)
+        {
+            HEADER h = new HEADER();
+            h.command = (int)COMMANDS.cdisconnect;
+            h.signum = SIGNUM.BIN;
+            h.containerID = contID;
+            h.channelID = channel;
+            h.size = network_utils.nData.Instance.getSize<disconnect>();
+            header = h;
+        }
+        public HEADER header
+        {
+            get { return Header; }
+            set { Header = value; }
+        }
+        private HEADER Header;
     }
 }

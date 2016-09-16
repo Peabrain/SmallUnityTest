@@ -32,7 +32,8 @@ public class ship : channel {
         else
         {
             int id = mynetwork.GetComponent<client>().ingameContID;
-            GameObject g = entity[id];
+            GameObject g = GetEntity(id);
+
             DateTime now = new DateTime();
             now = DateTime.Now;
             TimeSpan duration = now - last_clientupdate;
@@ -60,7 +61,7 @@ public class ship : channel {
         GameObject Player = Instantiate(Resources.Load("Prefabs/Player", typeof(GameObject)), transform) as GameObject;
         Player.transform.position = position;
         Player.transform.rotation = rotation;
-        entity[contID] = Player;
+        RegisterEntity(Player, contID);
         if(IsClient && ownPlayer)
         {
             Transform t = Player.transform.FindChild("Camera");
@@ -81,13 +82,16 @@ public class ship : channel {
             m.rotation = rotation;
             byte[] data = network_utils.nData.Instance.SerializeMsg<network_data.create_player>(m);
             SendToChannel(ref data);
-            foreach (KeyValuePair<int, GameObject> i in entity)
+
+            List<byte[]> datalist = new List<byte[]>();
+            IDictionaryEnumerator r = FirstEntity();
+            while(r.MoveNext())
             {
-                if(contID != i.Key)
+                if (contID != (int)r.Key)
                 {
-                    m.set(i.Key, number);
-                    m.position = i.Value.transform.position;
-                    m.rotation = i.Value.transform.rotation;
+                    m.set((int)r.Key, number);
+                    m.position = ((GameObject)r.Value).transform.position;
+                    m.rotation = ((GameObject)r.Value).transform.rotation;
                     byte[]data1 = network_utils.nData.Instance.SerializeMsg<network_data.create_player>(m);
                     mynetwork.Send(contID, data1);
                 }
@@ -107,7 +111,7 @@ public class ship : channel {
                     if (mynetwork.IsClient() == false)
                     {
                         GameObject g = GetNextSpawnPoint();
-                        SpawnPlayer(com.header.containerID, mynetwork.IsClient(), false, g.transform.position,g.transform.rotation);
+                        SpawnPlayer(com.header.containerID, mynetwork.IsClient(), false, g.transform.position, g.transform.rotation);
                     }
                 }
                 break;
@@ -126,10 +130,10 @@ public class ship : channel {
                     if (mynetwork.IsClient())
                     {
                         if (mynetwork.GetComponent<client>().ingameContID != com.header.containerID)
-                        {                           
-                            if(entity.ContainsKey(com.header.containerID))
+                        {
+                            GameObject g = GetEntity(com.header.containerID);
+                            if (g != null)
                             {
-                                GameObject g = entity[com.header.containerID];
                                 g.transform.position = com.position;
                                 g.transform.rotation = com.rotation;
                                 g.GetComponent<puppet>().SetMovementSpeed(com.speed);
@@ -138,19 +142,20 @@ public class ship : channel {
                     }
                     else
                     {
-                        if (entity.ContainsKey(com.header.containerID))
+                        GameObject g = GetEntity(com.header.containerID);
+                        if (g != null)
                         {
-                            GameObject g = entity[com.header.containerID];
                             g.transform.position = com.position;
                             g.transform.rotation = com.rotation;
                             g.GetComponent<puppet>().SetMovementSpeed(com.speed);
                             network_data.move_player m = new network_data.move_player();
-                            foreach (KeyValuePair<int, GameObject> i in entity)
+                            IDictionaryEnumerator i = FirstEntity();
+                            while (i.MoveNext())
                             {
-                                m.set(i.Key, number);
-                                m.position = i.Value.transform.position;
-                                m.rotation = i.Value.transform.rotation;
-                                m.speed = i.Value.GetComponent<puppet>().speed;
+                                m.set((int)i.Key, number);
+                                m.position = ((GameObject)i.Value).transform.position;
+                                m.rotation = ((GameObject)i.Value).transform.rotation;
+                                m.speed = ((GameObject)i.Value).GetComponent<puppet>().speed;
                                 byte[] data1 = network_utils.nData.Instance.SerializeMsg<network_data.move_player>(m);
                                 SendToChannel(ref data1);
                             }
@@ -158,6 +163,28 @@ public class ship : channel {
                     }
                 }
                 break;
+            case (int)network_data.COMMANDS.cdisconnect:
+                {
+                    network_data.disconnect com = network_utils.nData.Instance.DeserializeMsg<network_data.disconnect>(message);
+                    UnregisterEntity(com.header.containerID);
+                }
+                break;
+        }
+    }
+    internal override void UnregisterEntity(int contID)
+    {
+        GameObject g = GetEntity(contID);
+        base.UnregisterEntity(contID);
+        if (g != null)
+        {
+            Destroy(g);
+        }
+        if (mynetwork.IsClient() == false)
+        {
+            network_data.disconnect m = new network_data.disconnect();
+            m.set(contID, number);
+            byte[] data1 = network_utils.nData.Instance.SerializeMsg<network_data.disconnect>(m);
+            SendToChannel(ref data1);
         }
     }
 }

@@ -14,24 +14,6 @@ using network_utils;
 
 public class server : network {
 
-    public class SocketData
-    {
-        public SocketData()
-        {
-            del = false;
-            time = new DateTime();
-            this.setTime();
-        }
-        public void setTime()
-        {
-            time = DateTime.Now;
-        }
-        public NetworkStream stream;
-        public TcpClient socket;
-        public DateTime time;
-        public bool del;
-        public string playername;
-    };
     public int port = 40000;
     public DateTime time;
     List<SocketData> socketList;
@@ -251,13 +233,30 @@ public class server : network {
         for (int i = 0; i < delList.Count; i++)
         {
             int id = socketUsedIDList[delList[i]];
-            socketUsedIDList.RemoveAt(delList[i]);
+            SocketData so = socketList[id];
+            socketUsedIDList.Remove(id);
             socketFreeIDList.Add(id);
             Debug.Log("Disconnect from Game " + id);
+            while(so.channels.Count > 0)
+            {
+                channel c = ChannelObjectList[so.channels[0]].GetComponent<channel>();
+                if(c != null)
+                {
+                    c.UnregisterEntity(id);
+                }
+            }
         }
     }
     void SetPing(int contID)
     {
         socketList[contID].setTime();
+    }
+    public override void RegisterChannelToSocketdata(int contID, int channel)
+    {
+        socketList[contID].channels.Add(channel);
+    }
+    public override void UnregisterChannelToSocketdata(int contID, int channel)
+    {
+        socketList[contID].channels.Remove(channel);
     }
 }
