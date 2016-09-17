@@ -24,7 +24,8 @@ namespace network_data
         center_ship = 13,
         ccreate_player = 14,
         cmove_player = 15,
-        cdisconnect = 16
+        cdisconnect = 16,
+        ctrigger = 17
     };
 
 /*    [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -459,5 +460,37 @@ namespace network_data
             set { Header = value; }
         }
         private HEADER Header;
+    }
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct trigger
+    {
+        public void set(int contID, int channel)
+        {
+            HEADER h = new HEADER();
+            h.command = (int)COMMANDS.ctrigger;
+            h.signum = SIGNUM.BIN;
+            h.containerID = contID;
+            h.channelID = channel;
+            h.size = network_utils.nData.Instance.getSize<trigger>();
+            header = h;
+        }
+        public HEADER header
+        {
+            get { return Header; }
+            set { Header = value; }
+        }
+        public bool on
+        {
+            get { return On; }
+            set { On = value; }
+        }
+        public int netID
+        {
+            get { return NetID; }
+            set { NetID = value; }
+        }
+        private HEADER Header;
+        private bool On;
+        private int NetID;
     }
 }

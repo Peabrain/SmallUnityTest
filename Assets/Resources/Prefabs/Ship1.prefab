@@ -2807,6 +2807,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3af68d3e2756a8844a9dd5ca2266480a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mynetwork: {fileID: 0}
   number: -1
 --- !u!114 &114000011100178142
 MonoBehaviour:
@@ -2819,6 +2820,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4dcc97264493efc4f891770a6a378741, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  netID: 0
   door: {fileID: 1000011679655430}
 --- !u!114 &114000012659865236
 MonoBehaviour:
@@ -2831,6 +2833,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4dcc97264493efc4f891770a6a378741, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  netID: 1
   door: {fileID: 1000013134289162}
 --- !u!114 &114000012754002358
 MonoBehaviour:
@@ -2843,6 +2846,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4dcc97264493efc4f891770a6a378741, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  netID: 4
   door: {fileID: 1000011624364870}
 --- !u!114 &114000012796545676
 MonoBehaviour:
@@ -2855,6 +2859,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4dcc97264493efc4f891770a6a378741, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  netID: 3
   door: {fileID: 1000010837344130}
 --- !u!114 &114000013203811234
 MonoBehaviour:
@@ -2867,6 +2872,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4dcc97264493efc4f891770a6a378741, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  netID: 2
   door: {fileID: 1000012038749088}
 --- !u!114 &114000013635710582
 MonoBehaviour:
@@ -2879,6 +2885,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4dcc97264493efc4f891770a6a378741, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  netID: 5
   door: {fileID: 1000010645362810}
 --- !u!114 &114000014070626170
 MonoBehaviour:
@@ -2891,8 +2898,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88c5e3cab22af584693d31e10f99508d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  number: -1
   mynetwork: {fileID: 0}
+  number: -1
+  netID: 0
   Spawnpoints:
   - {fileID: 1000010202209112}
   - {fileID: 1000011596100060}

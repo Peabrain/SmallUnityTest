@@ -6,30 +6,39 @@ using System;
 
 public class ship : channel {
 
+    public int netID = 0;
     public List<GameObject> Spawnpoints = new List<GameObject>();
     int spos = 0;
+    Dictionary<int,trigger> triggers = new Dictionary<int, trigger>();
     DateTime last_clientupdate = new DateTime();
     // Use this for initialization
     void Start () {
         last_clientupdate = DateTime.Now;
+        trigger[] tri = transform.GetComponentsInChildren<trigger>();
+        if(mynetwork.IsClient())
+        {
+            foreach(trigger t in tri)
+            {
+                t.mychannel = this.GetComponent<channel>();
+                t.GetComponent<BoxCollider>().enabled = false;
+                triggers[t.netID] = t;
+            }
+        }
+        else
+        {
+            foreach (trigger t in tri)
+            {
+                t.mychannel = this.GetComponent<channel>();
+                triggers[t.netID] = t;
+            }
+        }
+        Debug.Log("Found " + triggers.Count + " Triggers");
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (mynetwork.IsClient() == false)
-        {
-/*            network_data.move_player m = new network_data.move_player();
-            foreach (KeyValuePair<int, GameObject> i in entity)
-            {
-                m.set(i.Key, number);
-                m.position = i.Value.transform.position;
-                m.rotation = i.Value.transform.rotation;
-                byte[] data1 = network_utils.nData.Instance.SerializeMsg<network_data.move_player>(m);
-                SendToChannel(ref data1);
-            }
-  */      }
-        else
+        if (mynetwork.IsClient())
         {
             int id = mynetwork.GetComponent<client>().ingameContID;
             GameObject g = GetEntity(id);
@@ -47,6 +56,42 @@ public class ship : channel {
                 m.speed = g.GetComponent<puppet>().speed;
                 byte[] data1 = network_utils.nData.Instance.SerializeMsg<network_data.move_player>(m);
                 mynetwork.Send(id, data1);
+            }
+        }
+        else
+        {
+            network_data.move_player m = new network_data.move_player();
+            IDictionaryEnumerator i = FirstEntity();
+            while (i.MoveNext())
+            {
+                GameObject g = (GameObject)i.Value;
+                if (g.GetComponent<puppet>().speed_change)
+                {
+                    m.set((int)i.Key, number);
+                    m.position = ((GameObject)i.Value).transform.position;
+                    m.rotation = ((GameObject)i.Value).transform.rotation;
+                    m.speed = g.GetComponent<puppet>().speed;
+                    byte[] data1 = network_utils.nData.Instance.SerializeMsg<network_data.move_player>(m);
+                    SendToChannel(ref data1);
+                }
+            }
+            foreach (KeyValuePair<int, trigger> j in triggers)
+            {
+                trigger t = (trigger)j.Value;
+                if (t.HasChanged() == true)
+                {
+                    if(t.IsOn())
+                        t.Activate();
+                    else
+                        t.Deactivate();
+                    t.ClearChanged();
+                    network_data.trigger m1 = new network_data.trigger();
+                    m1.set(-1, number);
+                    m1.netID = j.Key;
+                    m1.on = t.IsOn();
+                    byte[] data1 = network_utils.nData.Instance.SerializeMsg<network_data.trigger>(m1);
+                    SendToChannel(ref data1);
+                }
             }
         }
     }
@@ -95,6 +140,16 @@ public class ship : channel {
                     byte[]data1 = network_utils.nData.Instance.SerializeMsg<network_data.create_player>(m);
                     mynetwork.Send(contID, data1);
                 }
+            }
+            foreach (KeyValuePair<int, trigger> j in triggers)
+            {
+                trigger t = (trigger)j.Value;
+                network_data.trigger m1 = new network_data.trigger();
+                m1.set(contID, number);
+                m1.netID = j.Key;
+                m1.on = t.IsOn();
+                byte[] data1 = network_utils.nData.Instance.SerializeMsg<network_data.trigger>(m1);
+                mynetwork.Send(contID, data1);
             }
         }
     }
@@ -148,17 +203,6 @@ public class ship : channel {
                             g.transform.position = com.position;
                             g.transform.rotation = com.rotation;
                             g.GetComponent<puppet>().SetMovementSpeed(com.speed);
-                            network_data.move_player m = new network_data.move_player();
-                            IDictionaryEnumerator i = FirstEntity();
-                            while (i.MoveNext())
-                            {
-                                m.set((int)i.Key, number);
-                                m.position = ((GameObject)i.Value).transform.position;
-                                m.rotation = ((GameObject)i.Value).transform.rotation;
-                                m.speed = ((GameObject)i.Value).GetComponent<puppet>().speed;
-                                byte[] data1 = network_utils.nData.Instance.SerializeMsg<network_data.move_player>(m);
-                                SendToChannel(ref data1);
-                            }
                         }
                     }
                 }
@@ -167,6 +211,19 @@ public class ship : channel {
                 {
                     network_data.disconnect com = network_utils.nData.Instance.DeserializeMsg<network_data.disconnect>(message);
                     UnregisterEntity(com.header.containerID);
+                }
+                break;
+            case (int)network_data.COMMANDS.ctrigger:
+                {
+                    network_data.trigger com = network_utils.nData.Instance.DeserializeMsg<network_data.trigger>(message);
+                    if(triggers.ContainsKey(com.netID))
+                    {
+                        trigger t = triggers[com.netID];
+                        if (com.on)
+                            t.Activate();
+                        else
+                            t.Deactivate();
+                    }
                 }
                 break;
         }
