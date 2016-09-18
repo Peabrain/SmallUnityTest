@@ -15,7 +15,7 @@ public class trigger : MonoBehaviour {
     {
         if (door != null)
         {
-            SetIsOn(true);
+            SetActive(true);
         }
     }
     void OnTriggerStay(Collider other)
@@ -26,7 +26,7 @@ public class trigger : MonoBehaviour {
     {
         if (door != null)
         {
-            SetIsOn(false);
+            SetActive(false);
         }
     }
     public void Activate()
@@ -47,7 +47,7 @@ public class trigger : MonoBehaviour {
     {
         return isOn;
     }
-    public void SetIsOn(bool a)
+    public void SetActive(bool a)
     {
         isOn = a;
         if(isOn)
