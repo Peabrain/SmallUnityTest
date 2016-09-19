@@ -9,38 +9,30 @@ public class ship : channel {
     public int netID = 0;
     public List<GameObject> Spawnpoints = new List<GameObject>();
     int spos = 0;
-    Dictionary<int,trigger> triggers = new Dictionary<int, trigger>();
+    //    Dictionary<int,trigger> triggers = new Dictionary<int, trigger>();
+    Dictionary<int,interactionlink> interactionlinks = new Dictionary<int, interactionlink>();
     DateTime last_clientupdate = new DateTime();
     // Use this for initialization
+    public void Init()
+    {
+        interactionlink[] tri = transform.GetComponentsInChildren<interactionlink>();
+        foreach (interactionlink i in tri)
+            interactionlinks[i.netID] = i;
+        bool b = GetNetwork().IsClient();
+        foreach (KeyValuePair<int, interactionlink> j in interactionlinks)
+            j.Value.Init(b);
+        Debug.Log("Found " + interactionlinks.Count + " interactionlinks");
+    }
     void Start () {
         last_clientupdate = DateTime.Now;
-        trigger[] tri = transform.GetComponentsInChildren<trigger>();
-        if(mynetwork.IsClient())
-        {
-            foreach(trigger t in tri)
-            {
-                t.mychannel = this.GetComponent<channel>();
-                t.GetComponent<BoxCollider>().enabled = false;
-                triggers[t.netID] = t;
-            }
-        }
-        else
-        {
-            foreach (trigger t in tri)
-            {
-                t.mychannel = this.GetComponent<channel>();
-                triggers[t.netID] = t;
-            }
-        }
-        Debug.Log("Found " + triggers.Count + " Triggers");
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (mynetwork.IsClient())
+        if (GetNetwork().IsClient())
         {
-            int id = mynetwork.GetComponent<client>().ingameContID;
+            int id = GetNetwork().GetComponent<client>().ingameContID;
             GameObject g = GetEntity(id);
 
             DateTime now = new DateTime();
@@ -50,12 +42,12 @@ public class ship : channel {
             {
                 last_clientupdate = now;
                 network_data.move_player m = new network_data.move_player();
-                m.set(id, number);
+                m.set(id, GetChannel());
                 m.position = g.transform.position;
                 m.rotation = g.transform.rotation;
                 m.speed = g.GetComponent<puppet>().speed;
                 byte[] data1 = network_utils.nData.Instance.SerializeMsg<network_data.move_player>(m);
-                mynetwork.Send(id, data1);
+                GetNetwork().Send(id, data1);
             }
         }
         else
@@ -67,7 +59,7 @@ public class ship : channel {
                 GameObject g = (GameObject)i.Value;
                 if (g.GetComponent<puppet>().speed_change)
                 {
-                    m.set((int)i.Key, number);
+                    m.set((int)i.Key, GetChannel());
                     m.position = ((GameObject)i.Value).transform.position;
                     m.rotation = ((GameObject)i.Value).transform.rotation;
                     m.speed = g.GetComponent<puppet>().speed;
@@ -75,23 +67,10 @@ public class ship : channel {
                     SendToChannel(ref data1);
                 }
             }
-            foreach (KeyValuePair<int, trigger> j in triggers)
+            foreach (KeyValuePair<int, interactionlink> j in interactionlinks)
             {
-                trigger t = (trigger)j.Value;
-                if (t.HasChanged() == true)
-                {
-                    if(t.IsOn())
-                        t.Activate();
-                    else
-                        t.Deactivate();
-                    t.ClearChanged();
-                    network_data.trigger m1 = new network_data.trigger();
-                    m1.set(-1, number);
-                    m1.netID = j.Key;
-                    m1.on = t.IsOn();
-                    byte[] data1 = network_utils.nData.Instance.SerializeMsg<network_data.trigger>(m1);
-                    SendToChannel(ref data1);
-                }
+                interactionlink t = (interactionlink)j.Value;
+                t.Logic(this);
             }
         }
     }
@@ -117,12 +96,12 @@ public class ship : channel {
         {
             Player.AddComponent<puppet>();
         }
-        if (Player) Debug.Log("Enter Ship (" + number + ")" + " player " + contID + " pos: " + position +" rot:" + rotation);
+        if (Player) Debug.Log("Enter Ship (" + GetChannel() + ")" + " player " + contID + " pos: " + position +" rot:" + rotation);
 
         if(IsClient == false)
         {
             network_data.create_player m = new network_data.create_player();
-            m.set(contID, number);
+            m.set(contID, GetChannel());
             m.position = position;
             m.rotation = rotation;
             byte[] data = network_utils.nData.Instance.SerializeMsg<network_data.create_player>(m);
@@ -134,14 +113,14 @@ public class ship : channel {
             {
                 if (contID != (int)r.Key)
                 {
-                    m.set((int)r.Key, number);
+                    m.set((int)r.Key, GetChannel());
                     m.position = ((GameObject)r.Value).transform.position;
                     m.rotation = ((GameObject)r.Value).transform.rotation;
                     byte[]data1 = network_utils.nData.Instance.SerializeMsg<network_data.create_player>(m);
-                    mynetwork.Send(contID, data1);
+                    GetNetwork().Send(contID, data1);
                 }
             }
-            foreach (KeyValuePair<int, trigger> j in triggers)
+  /*          foreach (KeyValuePair<int, trigger> j in triggers)
             {
                 trigger t = (trigger)j.Value;
                 network_data.trigger m1 = new network_data.trigger();
@@ -151,6 +130,7 @@ public class ship : channel {
                 byte[] data1 = network_utils.nData.Instance.SerializeMsg<network_data.trigger>(m1);
                 mynetwork.Send(contID, data1);
             }
+*/
         }
     }
     public override void ProcessMessage(ref byte[] message)
@@ -163,28 +143,28 @@ public class ship : channel {
             case (int)network_data.COMMANDS.center_ship:
                 {
                     network_data.enter_ship com = network_utils.nData.Instance.DeserializeMsg<network_data.enter_ship>(message);
-                    if (mynetwork.IsClient() == false)
+                    if (GetNetwork().IsClient() == false)
                     {
                         GameObject g = GetNextSpawnPoint();
-                        SpawnPlayer(com.header.containerID, mynetwork.IsClient(), false, g.transform.position, g.transform.rotation);
+                        SpawnPlayer(com.header.containerID, GetNetwork().IsClient(), false, g.transform.position, g.transform.rotation);
                     }
                 }
                 break;
             case (int)network_data.COMMANDS.ccreate_player:
                 {
                     network_data.create_player com = network_utils.nData.Instance.DeserializeMsg<network_data.create_player>(message);
-                    if (mynetwork.IsClient() == true)
+                    if (GetNetwork().IsClient() == true)
                     {
-                        SpawnPlayer(com.header.containerID, mynetwork.IsClient(), mynetwork.GetComponent<client>().ingameContID == com.header.containerID, com.position, com.rotation);
+                        SpawnPlayer(com.header.containerID, GetNetwork().IsClient(), GetNetwork().GetComponent<client>().ingameContID == com.header.containerID, com.position, com.rotation);
                     }
                 }
                 break;
             case (int)network_data.COMMANDS.cmove_player:
                 {
                     network_data.move_player com = network_utils.nData.Instance.DeserializeMsg<network_data.move_player>(message);
-                    if (mynetwork.IsClient())
+                    if (GetNetwork().IsClient())
                     {
-                        if (mynetwork.GetComponent<client>().ingameContID != com.header.containerID)
+                        if (GetNetwork().GetComponent<client>().ingameContID != com.header.containerID)
                         {
                             GameObject g = GetEntity(com.header.containerID);
                             if (g != null)
@@ -216,9 +196,9 @@ public class ship : channel {
             case (int)network_data.COMMANDS.ctrigger:
                 {
                     network_data.trigger com = network_utils.nData.Instance.DeserializeMsg<network_data.trigger>(message);
-                    if(triggers.ContainsKey(com.netID))
+                    if(interactionlinks.ContainsKey(com.netID))
                     {
-                        trigger t = triggers[com.netID];
+                        interactionlink t = interactionlinks[com.netID];
                         if (com.on)
                             t.Activate();
                         else
@@ -236,10 +216,10 @@ public class ship : channel {
         {
             Destroy(g);
         }
-        if (mynetwork.IsClient() == false)
+        if (GetNetwork().IsClient() == false)
         {
             network_data.disconnect m = new network_data.disconnect();
-            m.set(contID, number);
+            m.set(contID, GetChannel());
             byte[] data1 = network_utils.nData.Instance.SerializeMsg<network_data.disconnect>(m);
             SendToChannel(ref data1);
         }

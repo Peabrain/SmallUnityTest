@@ -67,6 +67,7 @@
     <Compile Include="Assets\Scripts\client.cs" />
     <Compile Include="Assets\Scripts\game.cs" />
     <Compile Include="Assets\Scripts\gui.cs" />
+    <Compile Include="Assets\Scripts\interactionlink.cs" />
     <Compile Include="Assets\Scripts\network.cs" />
     <Compile Include="Assets\Scripts\network_data.cs" />
     <Compile Include="Assets\Scripts\network_utils.cs" />

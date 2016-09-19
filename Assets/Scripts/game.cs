@@ -34,6 +34,7 @@ public class game : channel {
         int channel = n.AddGameObjectToChannel(Ship);
         s.SetNetwork(n);
         s.SetChannel(channel);
+        Ship.GetComponent<ship>().Init();
         object_name += "_" + channel;
         Ship.name = object_name;
         ShipList[channel] = Ship;

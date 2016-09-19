@@ -22,6 +22,7 @@ GameObject:
   - 65: {fileID: 65000012056750308}
   - 114: {fileID: 114000012567396324}
   - 111: {fileID: 111000010131926728}
+  - 114: {fileID: 114000010483879322}
   m_Layer: 0
   m_Name: Airlock
   m_TagString: Untagged
@@ -313,6 +314,18 @@ Animation:
   m_PlayAutomatically: 1
   m_AnimatePhysics: 0
   m_CullingType: 0
+--- !u!114 &114000010483879322
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000010390270446}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1347ba4b3ed3c5f44b42db0446eea733, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  netID: 0
 --- !u!114 &114000012567396324
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -324,4 +337,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4dcc97264493efc4f891770a6a378741, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  door: {fileID: 1000010390270446}

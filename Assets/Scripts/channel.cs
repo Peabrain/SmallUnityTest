@@ -6,8 +6,8 @@ public class channel : MonoBehaviour
 {
 
     Dictionary<int, GameObject> entities = new Dictionary<int, GameObject>();
-    public network mynetwork = null;
-    public int number = -1;
+    network mynetwork = null;
+    int number = -1;
     // Use this for initialization
     void Start()
     {
@@ -61,5 +61,13 @@ public class channel : MonoBehaviour
     internal IDictionaryEnumerator FirstEntity()
     {
         return entities.GetEnumerator();
+    }
+    public int GetChannel()
+    {
+        return number;
+    }
+    public network GetNetwork()
+    {
+        return mynetwork;
     }
 }
