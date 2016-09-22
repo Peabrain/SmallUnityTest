@@ -20,9 +20,9 @@ GameObject:
   m_Component:
   - 4: {fileID: 4000011932847970}
   - 65: {fileID: 65000012056750308}
-  - 114: {fileID: 114000012567396324}
   - 111: {fileID: 111000010131926728}
   - 114: {fileID: 114000010483879322}
+  - 114: {fileID: 114000013410338152}
   m_Layer: 0
   m_Name: Airlock
   m_TagString: Untagged
@@ -326,7 +326,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   netID: 0
---- !u!114 &114000012567396324
+  TriggerObject: {fileID: 0}
+--- !u!114 &114000013410338152
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -337,3 +338,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4dcc97264493efc4f891770a6a378741, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  auto: 1

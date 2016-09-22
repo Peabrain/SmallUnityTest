@@ -53,6 +53,7 @@ public class gui : MonoBehaviour {
                 n.AddGameObjectToChannel(go);
                 go.GetComponent<game>().LoadShip("Prefabs/Ship1", "Ship");
                 isAtStartup = false;
+                Cursor.lockState = CursorLockMode.Locked;
             }
         }
     }

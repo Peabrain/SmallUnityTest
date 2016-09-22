@@ -6,63 +6,49 @@ using System;
 
 public class interactionlink : MonoBehaviour {
 
-    [Serializable]
-    public struct triggerObj
-    {
-        public int id;
-        public trigger tr;
-    }
-    public triggerObj[] tri;
-
     public int netID = 0;
-    Dictionary<int, trigger> triggers = new Dictionary<int, trigger>();
-    bool active = false;
-	// Use this for initialization
-	void Start () {
+    public GameObject TriggerObject = null;
+    trigger Trigger = null;
+    channel mychannel = null;
+    // Use this for initialization
+    void Start () {
     }
 
-    public void Init(bool isClient)
+    public void Init(channel mychannel)
     {
-        if (isClient)
+        this.mychannel = mychannel;
+        Trigger = TriggerObject.GetComponent<trigger>();
+        if (mychannel.GetNetwork().IsClient())
         {
-            foreach (triggerObj t in tri)
-            {
-                t.tr.GetComponent<BoxCollider>().enabled = false;
-                triggers[t.id] = t.tr;
-            }
-        }
-        else
-        {
-            foreach (triggerObj t in tri)
-            {
-                triggers[t.id] = t.tr;
-            }
+            if (Trigger.auto) Trigger.GetComponent<BoxCollider>().enabled = false;
         }
     }
     // Update is called once per frame
     void Update () {
+        if(mychannel != null)
+        {
+            if (!mychannel.GetNetwork().IsClient())
+            {
+                if (Trigger.HasChanged() == true)
+                {
+                    if (Trigger.IsOn())
+                        Activate();
+                    else
+                        Deactivate();
+                    Trigger.ClearChanged();
+                    network_data.trigger m1 = new network_data.trigger();
+                    m1.set(-1, mychannel.GetChannel());
+                    m1.netID = netID;
+                    m1.on = Trigger.IsOn();
+                    byte[] data1 = network_utils.nData.Instance.SerializeMsg<network_data.trigger>(m1);
+                    mychannel.SendToChannel(ref data1);
+                }
+            }
+        }
     }
 
     public virtual void Logic(channel mychannel)
     {
-        foreach (KeyValuePair<int, trigger> j in triggers)
-        {
-            trigger t = (trigger)j.Value;
-            if (t.HasChanged() == true)
-            {
-                if (t.IsOn())
-                    Activate();
-                else
-                    Deactivate();
-                t.ClearChanged();
-                network_data.trigger m1 = new network_data.trigger();
-                m1.set(-1, mychannel.GetChannel());
-                m1.netID = netID;
-                m1.on = t.IsOn();
-                byte[] data1 = network_utils.nData.Instance.SerializeMsg<network_data.trigger>(m1);
-                mychannel.SendToChannel(ref data1);
-            }
-        }
     }
     public virtual void Activate()
     {

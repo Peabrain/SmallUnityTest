@@ -12,15 +12,20 @@ public class ship : channel {
     //    Dictionary<int,trigger> triggers = new Dictionary<int, trigger>();
     Dictionary<int,interactionlink> interactionlinks = new Dictionary<int, interactionlink>();
     DateTime last_clientupdate = new DateTime();
+    GameObject UI = null;
+    GameObject myCam = null;
     // Use this for initialization
     public void Init()
     {
+        UI = GameObject.Find("UI");
+        if (UI != null)
+            Debug.Log("Found UI");
         interactionlink[] tri = transform.GetComponentsInChildren<interactionlink>();
         foreach (interactionlink i in tri)
             interactionlinks[i.netID] = i;
         bool b = GetNetwork().IsClient();
         foreach (KeyValuePair<int, interactionlink> j in interactionlinks)
-            j.Value.Init(b);
+            j.Value.Init(this);
         Debug.Log("Found " + interactionlinks.Count + " interactionlinks");
     }
     void Start () {
@@ -38,7 +43,7 @@ public class ship : channel {
             DateTime now = new DateTime();
             now = DateTime.Now;
             TimeSpan duration = now - last_clientupdate;
-            if (duration > TimeSpan.FromMilliseconds(200) || g.GetComponent<puppet>().speed_change)
+            if (duration > TimeSpan.FromMilliseconds(200) || (g != null && g.GetComponent<puppet>().speed_change))
             {
                 last_clientupdate = now;
                 network_data.move_player m = new network_data.move_player();
@@ -48,6 +53,20 @@ public class ship : channel {
                 m.speed = g.GetComponent<puppet>().speed;
                 byte[] data1 = network_utils.nData.Instance.SerializeMsg<network_data.move_player>(m);
                 GetNetwork().Send(id, data1);
+            }
+            interactionlink interact = MouseOver();
+            if (UI != null)
+            {
+                if (interact != null)
+                {
+                    Transform m = UI.transform.FindChild("Cursor_Use");
+                    m.gameObject.SetActive(true);
+                }
+                else
+                {
+                    Transform m = UI.transform.FindChild("Cursor_Use");
+                    m.gameObject.SetActive(false);
+                }
             }
         }
         else
@@ -67,11 +86,6 @@ public class ship : channel {
                     SendToChannel(ref data1);
                 }
             }
-            foreach (KeyValuePair<int, interactionlink> j in interactionlinks)
-            {
-                interactionlink t = (interactionlink)j.Value;
-                t.Logic(this);
-            }
         }
     }
     GameObject GetNextSpawnPoint()
@@ -89,6 +103,7 @@ public class ship : channel {
         if(IsClient && ownPlayer)
         {
             Transform t = Player.transform.FindChild("Camera");
+            myCam = t.gameObject;
             t.gameObject.SetActive(true);
             Player.AddComponent<FirstPersonController>();
         }
@@ -223,5 +238,34 @@ public class ship : channel {
             byte[] data1 = network_utils.nData.Instance.SerializeMsg<network_data.disconnect>(m);
             SendToChannel(ref data1);
         }
+    }
+    interactionlink MouseOver()
+    {
+        interactionlink ret = null;
+        if(GetNetwork().IsClient())
+        {
+            foreach (KeyValuePair<int, interactionlink> j in interactionlinks)
+            {
+                interactionlink k = j.Value;
+                if(k != null)
+                {
+                    if (k.TriggerObject.GetComponent<trigger>().auto == false)
+                    {
+                        if (k.TriggerObject.GetComponent<trigger>().MouseOver())
+                        {
+                            Collider c = k.TriggerObject.GetComponent<Collider>();
+                            Vector3 v = myCam.transform.rotation * new Vector3(0,0,1);
+                            Ray ray = myCam.GetComponent<Camera>().ScreenPointToRay(new Vector3(0, 0, 0));
+                            ray.direction = v;
+                            ray.origin = myCam.transform.position;
+                            RaycastHit hitinfo;
+                            if(c.Raycast(ray, out hitinfo, 1.5f))
+                                ret = k;
+                        }
+                    }
+                }
+            }
+        }
+        return ret;
     }
 }

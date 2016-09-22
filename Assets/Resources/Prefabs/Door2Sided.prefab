@@ -20,9 +20,9 @@ GameObject:
   m_Component:
   - 4: {fileID: 4000013147630592}
   - 65: {fileID: 65000010267422652}
-  - 114: {fileID: 114000010635368730}
   - 111: {fileID: 111000013630195082}
   - 114: {fileID: 114000012841216248}
+  - 114: {fileID: 114000011875508414}
   m_Layer: 0
   m_Name: Door2Sided
   m_TagString: Untagged
@@ -288,7 +288,7 @@ Animation:
   m_PlayAutomatically: 1
   m_AnimatePhysics: 0
   m_CullingType: 0
---- !u!114 &114000010635368730
+--- !u!114 &114000011875508414
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -299,6 +299,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4dcc97264493efc4f891770a6a378741, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  auto: 1
 --- !u!114 &114000012841216248
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -311,3 +312,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   netID: 0
+  TriggerObject: {fileID: 0}

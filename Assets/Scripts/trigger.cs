@@ -3,13 +3,15 @@ using System.Collections;
 
 public class trigger : MonoBehaviour {
 
+    public bool auto = false;
     bool changed = false;
     bool isOn = false;
     int InTriggerCounter = 0;
+    bool mouseover = false;
 	// Use this for initialization
 	void OnTriggerEnter(Collider other)
     {
-        SetActive(true);
+        if(auto) SetActive(true);
     }
     void OnTriggerStay(Collider other)
     {
@@ -17,7 +19,7 @@ public class trigger : MonoBehaviour {
     }
     void OnTriggerExit(Collider other)
     {
-        SetActive(false);
+        if (auto) SetActive(false);
     }
     public bool IsOn()
     {
@@ -46,5 +48,17 @@ public class trigger : MonoBehaviour {
     public bool HasChanged()
     {
         return changed;
+    }
+    void OnMouseOver()
+    {
+        mouseover = true;
+    }
+    void OnMouseExit()
+    {
+        mouseover = false;
+    }
+    public bool MouseOver()
+    {
+        return mouseover;
     }
 }
