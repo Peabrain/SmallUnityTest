@@ -299,7 +299,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4dcc97264493efc4f891770a6a378741, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  netID: 0
   auto: 1
+  InteractionLink: {fileID: 0}
 --- !u!114 &114000012841216248
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -311,5 +313,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1347ba4b3ed3c5f44b42db0446eea733, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  netID: 0
-  TriggerObject: {fileID: 0}

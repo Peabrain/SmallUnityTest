@@ -479,17 +479,23 @@ namespace network_data
             get { return Header; }
             set { Header = value; }
         }
-        public bool on
+        public int count
         {
-            get { return On; }
-            set { On = value; }
+            get { return Count; }
+            set { Count = value; }
         }
         public int netID
         {
             get { return NetID; }
             set { NetID = value; }
         }
+        public bool on
+        {
+            get { return On; }
+            set { On = value; }
+        }
         private HEADER Header;
+        private int Count;
         private bool On;
         private int NetID;
     }

@@ -9,8 +9,7 @@ public class ship : channel {
     public int netID = 0;
     public List<GameObject> Spawnpoints = new List<GameObject>();
     int spos = 0;
-    //    Dictionary<int,trigger> triggers = new Dictionary<int, trigger>();
-    Dictionary<int,interactionlink> interactionlinks = new Dictionary<int, interactionlink>();
+    Dictionary<int, trigger> Triggers = new Dictionary<int, trigger>();
     DateTime last_clientupdate = new DateTime();
     GameObject UI = null;
     GameObject myCam = null;
@@ -20,13 +19,25 @@ public class ship : channel {
         UI = GameObject.Find("UI");
         if (UI != null)
             Debug.Log("Found UI");
-        interactionlink[] tri = transform.GetComponentsInChildren<interactionlink>();
-        foreach (interactionlink i in tri)
-            interactionlinks[i.netID] = i;
-        bool b = GetNetwork().IsClient();
-        foreach (KeyValuePair<int, interactionlink> j in interactionlinks)
-            j.Value.Init(this);
-        Debug.Log("Found " + interactionlinks.Count + " interactionlinks");
+        trigger[] trig = transform.GetComponentsInChildren<trigger>();
+        foreach (trigger ti in trig)
+        {
+            ti.Init(this);
+            Triggers[ti.netID] = ti;
+            if (GetNetwork().IsClient())
+            {
+                Collider c = ti.GetComponent<Collider>();
+                if (ti.auto)
+                    c.enabled = false;
+            }
+            else
+            {
+                Collider c = ti.GetComponent<Collider>();
+                if (!ti.auto)
+                    c.enabled = false;
+            }
+        }
+        Debug.Log("Found " + Triggers.Count + " triggers");
     }
     void Start () {
         last_clientupdate = DateTime.Now;
@@ -54,13 +65,21 @@ public class ship : channel {
                 byte[] data1 = network_utils.nData.Instance.SerializeMsg<network_data.move_player>(m);
                 GetNetwork().Send(id, data1);
             }
-            interactionlink interact = MouseOver();
+            trigger interact = MouseOver();
             if (UI != null)
             {
                 if (interact != null)
                 {
                     Transform m = UI.transform.FindChild("Cursor_Use");
                     m.gameObject.SetActive(true);
+                    if(GetNetwork().IsClient())
+                    {
+                        if (Input.GetMouseButtonDown(0))
+                        {
+                            client c = (client)GetNetwork();
+                            interact.SendRequest(c.ingameContID);
+                        }
+                    }
                 }
                 else
                 {
@@ -135,17 +154,11 @@ public class ship : channel {
                     GetNetwork().Send(contID, data1);
                 }
             }
-  /*          foreach (KeyValuePair<int, trigger> j in triggers)
+            foreach (KeyValuePair<int, trigger> j in Triggers)
             {
                 trigger t = (trigger)j.Value;
-                network_data.trigger m1 = new network_data.trigger();
-                m1.set(contID, number);
-                m1.netID = j.Key;
-                m1.on = t.IsOn();
-                byte[] data1 = network_utils.nData.Instance.SerializeMsg<network_data.trigger>(m1);
-                mynetwork.Send(contID, data1);
+                t.SendTriggerTo(contID);
             }
-*/
         }
     }
     public override void ProcessMessage(ref byte[] message)
@@ -211,13 +224,20 @@ public class ship : channel {
             case (int)network_data.COMMANDS.ctrigger:
                 {
                     network_data.trigger com = network_utils.nData.Instance.DeserializeMsg<network_data.trigger>(message);
-                    if(interactionlinks.ContainsKey(com.netID))
+                    Debug.Log("Get triggerdata");
+                    if(Triggers.ContainsKey(com.netID))
                     {
-                        interactionlink t = interactionlinks[com.netID];
-                        if (com.on)
-                            t.Activate();
+                        trigger t = Triggers[com.netID];
+                        if (GetNetwork().IsClient())
+                        {
+                            t.SetTrigger(com.count, com.on);
+                            t.DoActivate();
+                        }
                         else
-                            t.Deactivate();
+                        {
+                            t.TriggerRequest();
+                            t.DoActivate();
+                        }
                     }
                 }
                 break;
@@ -239,21 +259,21 @@ public class ship : channel {
             SendToChannel(ref data1);
         }
     }
-    interactionlink MouseOver()
+    trigger MouseOver()
     {
-        interactionlink ret = null;
+        trigger ret = null;
         if(GetNetwork().IsClient())
         {
-            foreach (KeyValuePair<int, interactionlink> j in interactionlinks)
+            foreach (KeyValuePair<int, trigger> j in Triggers)
             {
-                interactionlink k = j.Value;
+                trigger k = j.Value;
                 if(k != null)
                 {
-                    if (k.TriggerObject.GetComponent<trigger>().auto == false)
+                    if (k.auto == false)
                     {
-                        if (k.TriggerObject.GetComponent<trigger>().MouseOver())
+                        if (k.MouseOver())
                         {
-                            Collider c = k.TriggerObject.GetComponent<Collider>();
+                            Collider c = k.GetComponent<Collider>();
                             Vector3 v = myCam.transform.rotation * new Vector3(0,0,1);
                             Ray ray = myCam.GetComponent<Camera>().ScreenPointToRay(new Vector3(0, 0, 0));
                             ray.direction = v;
