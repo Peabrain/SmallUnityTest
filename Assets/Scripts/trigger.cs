@@ -68,10 +68,11 @@ public class trigger : MonoBehaviour {
         m1.netID = netID;
         m1.count = counter;
         m1.on = on;
+        m1.accept = link.Accept(on);
         byte[] data1 = network_utils.nData.Instance.SerializeMsg<network_data.trigger>(m1);
         mychannel.SendToChannel(ref data1);
         Debug.Log("trigger " + name + " " + counter);
-        if (!mychannel.GetNetwork().IsClient())
+        if (!mychannel.GetNetwork().IsClient() && m1.accept)
         {
             DoActivate();
         }
@@ -83,6 +84,7 @@ public class trigger : MonoBehaviour {
         m1.netID = netID;
         m1.count = counter;
         m1.on = on;
+        m1.accept = link.Accept(on);
         byte[] data1 = network_utils.nData.Instance.SerializeMsg<network_data.trigger>(m1);
         mychannel.GetNetwork().Send(contID, data1);
     }
@@ -102,13 +104,15 @@ public class trigger : MonoBehaviour {
     public void TriggerRequest()
     {
         bool on_ = this.on ^ true;
-        if (on_)
-            counter = 1;
-        else
-            counter = 0;
-        SetTrigger(counter,on_);
-        if (changed)
-            SendTrigger();
+        if (link.Accept(on_))
+        {
+            if (on_)
+                counter = 1;
+            else
+                counter = 0;
+            SetTrigger(counter, on_);
+        }
+        SendTrigger();
     }
     public void DoActivate()
     {

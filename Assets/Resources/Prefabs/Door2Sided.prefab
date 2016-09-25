@@ -21,8 +21,7 @@ GameObject:
   - 4: {fileID: 4000013147630592}
   - 65: {fileID: 65000010267422652}
   - 111: {fileID: 111000013630195082}
-  - 114: {fileID: 114000012841216248}
-  - 114: {fileID: 114000011875508414}
+  - 114: {fileID: 114000013041177354}
   m_Layer: 0
   m_Name: Door2Sided
   m_TagString: Untagged
@@ -288,7 +287,7 @@ Animation:
   m_PlayAutomatically: 1
   m_AnimatePhysics: 0
   m_CullingType: 0
---- !u!114 &114000011875508414
+--- !u!114 &114000013041177354
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -296,20 +295,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 1000010462288314}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4dcc97264493efc4f891770a6a378741, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  netID: 0
-  auto: 1
-  InteractionLink: {fileID: 0}
---- !u!114 &114000012841216248
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1000010462288314}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1347ba4b3ed3c5f44b42db0446eea733, type: 3}
+  m_Script: {fileID: 11500000, guid: b5ba0e9a4c84ca649b0a35e2e0aaf0c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

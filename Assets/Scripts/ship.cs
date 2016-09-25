@@ -230,8 +230,11 @@ public class ship : channel {
                         trigger t = Triggers[com.netID];
                         if (GetNetwork().IsClient())
                         {
-                            t.SetTrigger(com.count, com.on);
-                            t.DoActivate();
+                            if(com.accept)
+                            {
+                                t.SetTrigger(com.count, com.on);
+                                t.DoActivate();
+                            }
                         }
                         else
                         {

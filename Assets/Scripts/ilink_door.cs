@@ -1,36 +1,27 @@
 ﻿using UnityEngine;
 using System.Collections;
-using System.Collections.Generic;
-using System;
 
+public class ilink_door : interactionlink {
 
-public class interactionlink : MonoBehaviour {
-
-    // Use this for initialization
-    void Start () {
-    }
-
-    // Update is called once per frame
-    void Update ()
-    {
-    }
-
-    public virtual bool Accept(bool on)
-    {
-        return true;
-    }
-    public virtual void Activate()
+    internal bool doorOpen = false;
+    public override void Activate()
     {
         if (!GetComponent<Animation>().isPlaying)
             GetComponent<Animation>()["open"].normalizedTime = 0;
         GetComponent<Animation>()["open"].speed = 1;
         GetComponent<Animation>().Play("open");
+        doorOpen = true;
     }
-    public virtual void Deactivate()
+    public override void Deactivate()
     {
         if (!GetComponent<Animation>().isPlaying)
             GetComponent<Animation>()["open"].normalizedTime = 1;
         GetComponent<Animation>()["open"].speed = -1;
         GetComponent<Animation>().Play("open");
+        doorOpen = false;
+    }
+    public bool IsOpen()
+    {
+        return doorOpen;
     }
 }

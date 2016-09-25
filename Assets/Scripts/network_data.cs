@@ -494,9 +494,15 @@ namespace network_data
             get { return On; }
             set { On = value; }
         }
+        public bool accept
+        {
+            get { return Accept; }
+            set { Accept = value; }
+        }
         private HEADER Header;
         private int Count;
         private bool On;
+        private bool Accept;
         private int NetID;
     }
 }
