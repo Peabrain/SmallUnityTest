@@ -60,7 +60,6 @@ public class trigger : MonoBehaviour {
         if (this.on ^ on)
             changed = true;
         this.on = on;
-//        DoActivate();
     }
     void SendTrigger()
     {
