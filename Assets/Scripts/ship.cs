@@ -276,14 +276,21 @@ public class ship : channel {
                     {
                         if (k.MouseOver())
                         {
-                            Collider c = k.GetComponent<Collider>();
+                            Collider[] c = k.GetComponents<Collider>();
                             Vector3 v = myCam.transform.rotation * new Vector3(0,0,1);
                             Ray ray = myCam.GetComponent<Camera>().ScreenPointToRay(new Vector3(0, 0, 0));
                             ray.direction = v;
                             ray.origin = myCam.transform.position;
                             RaycastHit hitinfo;
-                            if(c.Raycast(ray, out hitinfo, 1.5f))
-                                ret = k;
+                            float dist = 1.5f;
+                            foreach (Collider cs in c)
+                            {
+                                if (cs.Raycast(ray, out hitinfo, dist))
+                                {
+                                    ret = k;
+                                    dist = hitinfo.distance;
+                                }
+                            }
                         }
                     }
                 }
