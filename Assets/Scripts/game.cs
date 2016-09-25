@@ -38,6 +38,8 @@ public class game : channel {
         object_name += "_" + channel;
         Ship.name = object_name;
         ShipList[channel] = Ship;
+//        Ship.transform.Rotate(new Vector3(0, 0, 1), 45);
+//        Ship.transform.Translate(0, 10, 0);
     }
     public void AddPlayer(int ID)
     {

@@ -54,6 +54,7 @@ public class FirstPersonController : puppet {
         }
         Vector3 speed = new Vector3(slideSpeed, -velY, forwardSpeed);
         speed = transform.rotation * (speed * movementSpeed);
+
         return speed;
     }
 }
