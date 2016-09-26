@@ -46,6 +46,7 @@ public class ship : channel {
     // Update is called once per frame
     void Update()
     {
+        if (!GetNetwork()) return;
         if (GetNetwork().IsClient())
         {
             int id = GetNetwork().GetComponent<client>().ingameContID;

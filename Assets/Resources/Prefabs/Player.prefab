@@ -71,7 +71,6 @@ GameObject:
   m_Component:
   - 4: {fileID: 4000011247358590}
   - 143: {fileID: 143000011756660000}
-  - 114: {fileID: 114000011853785586}
   m_Layer: 8
   m_Name: Player
   m_TagString: Untagged
@@ -545,22 +544,6 @@ Behaviour:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1000012857736426}
   m_Enabled: 1
---- !u!114 &114000011853785586
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1000011370567762}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b0e4859db992504488a9a33b084c15b4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  speed: 10
-  gravity: 10
-  maxVelocityChange: 10
-  canJump: 1
-  jumpHeight: 2
 --- !u!124 &124000010685411094
 Behaviour:
   m_ObjectHideFlags: 1
@@ -576,7 +559,7 @@ CharacterController:
   m_GameObject: {fileID: 1000011370567762}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 2
   m_Height: 2
   m_Radius: 0.5
