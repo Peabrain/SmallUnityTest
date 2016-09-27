@@ -73,7 +73,7 @@ public class ship : channel {
         }
         else
         {
-            g.z += Time.deltaTime * 2;
+            g.y += Time.deltaTime * 2;
             Quaternion q = Quaternion.Euler(g);
             transform.localRotation = q;
         }

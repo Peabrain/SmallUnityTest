@@ -18,11 +18,14 @@ public class client : network {
     SocketData socketdata = new SocketData();
     // Use this for initialization
     void Start () {
-        StartClient("192.168.1.16", port);
     }
-	
-	// Update is called once per frame
-	void Update () {
+
+
+    public void Connect(string s)
+    {
+        StartClient(s, port);
+    }// Update is called once per frame
+    void Update () {
         if (ingameContID != -1)
         {
             TimeSpan duration = DateTime.Now - socketdata.time;

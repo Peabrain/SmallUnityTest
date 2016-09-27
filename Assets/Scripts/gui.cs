@@ -5,6 +5,7 @@ public class gui : MonoBehaviour {
 
     // Use this for initialization
     private bool isAtStartup = true;
+    public string myserver;
     void Awake()
     {
         string[] sys = System.Environment.GetCommandLineArgs();
@@ -49,6 +50,7 @@ public class gui : MonoBehaviour {
                 go.name = "game";
                 go.AddComponent<game>();
                 go.AddComponent<client>();
+                go.GetComponent<client>().Connect(myserver);
                 network n = go.GetComponent<network>();
                 n.AddGameObjectToChannel(go);
                 go.GetComponent<game>().LoadShip("Prefabs/Ship1", "Ship");
@@ -64,8 +66,9 @@ public class gui : MonoBehaviour {
             GUI.Label(new Rect(2, 10, 150, 100), "Press S for server");
             //            GUI.Label(new Rect(2, 30, 150, 100), "Press B for both");
             GUI.Label(new Rect(2, 50, 150, 100), "Press C for client");
+            myserver = GUI.TextField(new Rect(2, 90, 150, 20), "localhost");
         }
-  //      else
- //           network.GetComponent<network>().OnGUI();
+        //      else
+        //           network.GetComponent<network>().OnGUI();
     }
 }
