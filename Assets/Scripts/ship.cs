@@ -13,6 +13,18 @@ public class ship : channel {
     DateTime last_clientupdate = new DateTime();
     GameObject UI = null;
     GameObject myCam = null;
+
+
+    float lastTime = 0;
+    float syncTime = 0;
+    float syncDelay = 0;
+    Vector3 lastPos = new Vector3(0, 0, 0);
+    Vector3 destPos = new Vector3(0, 0, 0);
+    Quaternion lastRot;
+    Quaternion destRot;
+
+    Vector3 g = new Vector3(0, 0, 0);
+
     // Use this for initialization
     public void Init()
     {
@@ -41,28 +53,47 @@ public class ship : channel {
     }
     void Start () {
         last_clientupdate = DateTime.Now;
+        lastPos = transform.position;
+        destPos = lastPos;
+        lastRot = transform.rotation;
+        destRot = lastRot;
+        lastTime = Time.time;
     }
 
     // Update is called once per frame
     void Update()
     {
         if (!GetNetwork()) return;
+
+        if(GetNetwork().IsClient())
+        {
+            syncTime += Time.deltaTime;
+            transform.position = Vector3.Lerp(lastPos, destPos, syncTime / syncDelay);
+            transform.rotation = Quaternion.Lerp(lastRot, destRot, syncTime / syncDelay);
+        }
+        else
+        {
+            g.z += Time.deltaTime * 2;
+            Quaternion q = Quaternion.Euler(g);
+            transform.localRotation = q;
+        }
+
+        DateTime now = new DateTime();
+        now = DateTime.Now;
+        TimeSpan duration = now - last_clientupdate;
+
         if (GetNetwork().IsClient())
         {
             int id = GetNetwork().GetComponent<client>().ingameContID;
             GameObject g = GetEntity(id);
 
-            DateTime now = new DateTime();
-            now = DateTime.Now;
-            TimeSpan duration = now - last_clientupdate;
-            if (duration > TimeSpan.FromMilliseconds(200) || (g != null && g.GetComponent<puppet>().speed_change))
+            if (duration > TimeSpan.FromMilliseconds(100))
             {
                 last_clientupdate = now;
                 network_data.move_player m = new network_data.move_player();
                 m.set(id, GetChannel());
-                m.position = g.transform.position;
-                m.rotation = g.transform.rotation;
-                m.speed = g.GetComponent<puppet>().speed;
+                m.position = g.transform.localPosition;
+                m.rotation = g.transform.localRotation;
                 byte[] data1 = network_utils.nData.Instance.SerializeMsg<network_data.move_player>(m);
                 GetNetwork().Send(id, data1);
             }
@@ -91,21 +122,27 @@ public class ship : channel {
         }
         else
         {
-            network_data.move_player m = new network_data.move_player();
-            IDictionaryEnumerator i = FirstEntity();
-            while (i.MoveNext())
+            if (duration > TimeSpan.FromMilliseconds(100))
             {
-                GameObject g = (GameObject)i.Value;
-                if (g.GetComponent<puppet>().speed_change)
+                last_clientupdate = now;
+                network_data.move_player m = new network_data.move_player();
+                IDictionaryEnumerator i = FirstEntity();
+                while (i.MoveNext())
                 {
+                    GameObject g = (GameObject)i.Value;
                     m.set((int)i.Key, GetChannel());
-                    m.position = ((GameObject)i.Value).transform.position;
-                    m.rotation = ((GameObject)i.Value).transform.rotation;
-                    m.speed = g.GetComponent<puppet>().speed;
+                    m.position = ((GameObject)i.Value).transform.localPosition;
+                    m.rotation = ((GameObject)i.Value).transform.localRotation;
                     byte[] data1 = network_utils.nData.Instance.SerializeMsg<network_data.move_player>(m);
                     SendToChannel(ref data1);
                 }
             }
+            network_data.move_player m2 = new network_data.move_player();
+            m2.set((int)-1, GetChannel());
+            m2.position = transform.position;
+            m2.rotation = transform.rotation;
+            byte[] data = network_utils.nData.Instance.SerializeMsg<network_data.move_player>(m2);
+            SendToChannel(ref data);
         }
     }
     GameObject GetNextSpawnPoint()
@@ -116,9 +153,10 @@ public class ship : channel {
     }
     public void SpawnPlayer(int contID,bool IsClient,bool ownPlayer,Vector3 position,Quaternion rotation)
     {
-        GameObject Player = Instantiate(Resources.Load("Prefabs/Player", typeof(GameObject)), transform) as GameObject;
-        Player.transform.position = position;
-        Player.transform.rotation = rotation;
+        Vector3 re = rotation.eulerAngles;
+        GameObject Player = Instantiate(Resources.Load("Prefabs/Player", typeof(GameObject)),transform) as GameObject;
+        Player.transform.localPosition = position;
+        Player.transform.localRotation = rotation;
         RegisterEntity(Player, contID);
         if(IsClient && ownPlayer)
         {
@@ -126,12 +164,16 @@ public class ship : channel {
             myCam = t.gameObject;
             t.gameObject.SetActive(true);
             Player.AddComponent<FirstPersonController>();
+            Player.GetComponent<puppet>().InitTransform(position, rotation);// rotation);
+            Player.AddComponent<FirstPersonController>().isActiv = true;
         }
         else
         {
             Player.AddComponent<puppet>();
+            Player.GetComponent<puppet>().InitTransform(position, rotation);// rotation);
         }
-        if (Player) Debug.Log("Enter Ship (" + GetChannel() + ")" + " player " + contID + " pos: " + position +" rot:" + rotation);
+        Player.GetComponent<puppet>().SetTransform(position, rotation);
+        if (Player) Debug.Log("Enter Ship (" + GetChannel() + ")" + " player " + contID + " pos: " + position + " rot:" + re.x + "," + re.y + "," + re.z);
 
         if(IsClient == false)
         {
@@ -149,8 +191,8 @@ public class ship : channel {
                 if (contID != (int)r.Key)
                 {
                     m.set((int)r.Key, GetChannel());
-                    m.position = ((GameObject)r.Value).transform.position;
-                    m.rotation = ((GameObject)r.Value).transform.rotation;
+                    m.position = ((GameObject)r.Value).transform.localPosition;
+                    m.rotation = ((GameObject)r.Value).transform.localRotation;
                     byte[]data1 = network_utils.nData.Instance.SerializeMsg<network_data.create_player>(m);
                     GetNetwork().Send(contID, data1);
                 }
@@ -175,7 +217,7 @@ public class ship : channel {
                     if (GetNetwork().IsClient() == false)
                     {
                         GameObject g = GetNextSpawnPoint();
-                        SpawnPlayer(com.header.containerID, GetNetwork().IsClient(), false, g.transform.position, g.transform.rotation);
+                        SpawnPlayer(com.header.containerID, GetNetwork().IsClient(), false, g.transform.localPosition, g.transform.localRotation);
                     }
                 }
                 break;
@@ -193,14 +235,17 @@ public class ship : channel {
                     network_data.move_player com = network_utils.nData.Instance.DeserializeMsg<network_data.move_player>(message);
                     if (GetNetwork().IsClient())
                     {
+                        if(com.header.containerID == -1)
+                        {
+                            SetTransform(com.position, com.rotation);
+                        }
+                        else
                         if (GetNetwork().GetComponent<client>().ingameContID != com.header.containerID)
                         {
                             GameObject g = GetEntity(com.header.containerID);
                             if (g != null)
                             {
-                                g.transform.position = com.position;
-                                g.transform.rotation = com.rotation;
-                                g.GetComponent<puppet>().SetMovementSpeed(com.speed);
+                                g.GetComponent<puppet>().SetTransform(com.position, com.rotation);
                             }
                         }
                     }
@@ -209,9 +254,7 @@ public class ship : channel {
                         GameObject g = GetEntity(com.header.containerID);
                         if (g != null)
                         {
-                            g.transform.position = com.position;
-                            g.transform.rotation = com.rotation;
-                            g.GetComponent<puppet>().SetMovementSpeed(com.speed);
+                            g.GetComponent<puppet>().SetTransform(com.position,com.rotation);
                         }
                     }
                 }
@@ -298,5 +341,17 @@ public class ship : channel {
             }
         }
         return ret;
+    }
+    public void SetTransform(Vector3 v, Quaternion r)
+    {
+        syncTime = 0f;
+        syncDelay = Time.time - lastTime;
+        lastTime = Time.time;
+
+        lastPos = transform.localPosition;
+        destPos = v;
+        lastRot = transform.localRotation;
+        destRot = r;
+        Debug.Log("Ship rotation " + r);
     }
 }

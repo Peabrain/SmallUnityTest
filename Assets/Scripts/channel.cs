@@ -8,7 +8,6 @@ public class channel : MonoBehaviour
     Dictionary<int, GameObject> entities = new Dictionary<int, GameObject>();
     network mynetwork = null;
     int number = -1;
-    Vector3 g = new Vector3(0,0,0);
     // Use this for initialization
     void Start()
     {
@@ -18,9 +17,6 @@ public class channel : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        g.z += Time.deltaTime * 2;
-        Quaternion q = Quaternion.Euler(g);
-        transform.localRotation = q;
     }
 
     public virtual void ProcessMessage(ref byte[] message)

@@ -3,46 +3,55 @@ using System.Collections;
 
 public class puppet : MonoBehaviour {
 
-    public float movementSpeed = 5.0f;
-    public float rotationSpeed = 5.0f;
-    public float updownLimit = 60.0f;
-    public float jumpSpeed = 2.0f;
+    float lastTime = 0;
+    float syncTime = 0;
+    float syncDelay = 0;
 
-    internal float velY = 0.0f;
-    public Vector3 speed = new Vector3(0, 0, 0);
-    Vector3 old_speed = new Vector3(0, 0, 0);
-    public bool speed_change = false;
-
-    internal float rotX = 0;
-    internal float timescale = 50.0f;
-    internal CharacterController characterController = null;
+    Vector3 lastPos = new Vector3(0, 0, 0);
+    Vector3 destPos = new Vector3(0, 0, 0);
+    Quaternion lastRot;
+    Quaternion destRot;
     // Use this for initialization
+    public void InitTransform(Vector3 v,Quaternion r)
+    {
+        lastTime = Time.time;
+        lastPos = v;
+        destPos = lastPos;
+        lastRot = r;
+        destRot = lastRot;
+        syncTime = 0f;
+    }
+    void Awake()
+    {
+//        InitTransform(transform.localPosition, transform.localRotation);
+    }
     void Start()
     {
-//        Cursor.visible = false;
-        characterController = GetComponent<CharacterController>();
+        //        Cursor.visible = false;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (characterController != null)
-        {
-            characterController.Move(speed * Time.deltaTime);
-        }
+        syncTime += Time.deltaTime;
+        transform.localPosition = Vector3.Lerp(lastPos, destPos, syncTime / syncDelay);
+        transform.localRotation = Quaternion.Lerp(lastRot, destRot, syncTime / syncDelay);
     }
-    public void SetMovementSpeed(Vector3 s)
+    public void SetTransform(Vector3 v,Quaternion r)
     {
-        old_speed = speed;
-        speed = s;
-        if (old_speed == speed)
-            speed_change = false;
-        else
-            speed_change = true;
+        syncTime = 0f;
+        syncDelay = Time.time - lastTime;
+        lastTime = Time.time;
+
+        lastPos = transform.localPosition;
+        destPos = v;
+        lastRot = transform.localRotation;
+        destRot = r;
     }
-    public  virtual Vector3 Control()
+    /*    public virtual Vector3 Control()
     {
         Vector3 speed = new Vector3(0,0,0);
         return speed;
     }
+*/
 }

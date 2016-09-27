@@ -3,15 +3,17 @@ using System.Collections;
 
 public class CharacterControls : MonoBehaviour {
 
-    public float speed = 10.0f;
-    public float gravity = 10.0f;
-    public float maxVelocityChange = 10.0f;
-    public bool canJump = true;
-    public float jumpHeight = 2.0f;
+    public float Speed = 10.0f;
+    public float Gravity = 10.0f;
+    public float MaxVelocityChange = 10.0f;
+    public bool CanJump = true;
+    public float JumpHeight = 2.0f;
     private bool grounded = false;
+    Vector3 speed = new Vector3(0, 0, 0);
+    bool speed_change = false;
 
-//    public float movementSpeed = 5.0f;
-//    public float rotationSpeed = 5.0f;
+    //    public float movementSpeed = 5.0f;
+    //    public float rotationSpeed = 5.0f;
     public float updownLimit = 60.0f;
     internal float rotX = 0;
     //    public float jumpSpeed = 2.0f;
@@ -30,8 +32,7 @@ public class CharacterControls : MonoBehaviour {
             //            head.gameObject.SetActive(false);
         }
     }
-
-    void FixedUpdate()
+    void Update()
     {
         if (grounded)
         {
@@ -39,7 +40,7 @@ public class CharacterControls : MonoBehaviour {
             Vector3 nn = new Vector3(0, 0, 0);
             Vector3 targetVelocity = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
             targetVelocity = transform.TransformDirection(targetVelocity);
-            targetVelocity *= speed;
+            targetVelocity *= Speed;
 
             float mouseLeftRight = Input.GetAxis("Mouse X") * Time.deltaTime * 200.0f;
             transform.Rotate(0, mouseLeftRight, 0);
@@ -55,7 +56,16 @@ public class CharacterControls : MonoBehaviour {
             // Apply a force that attempts to reach our target velocity
             Vector3 velocity = GetComponent<Rigidbody>().velocity;
             Vector3 velocityChange = (targetVelocity - velocity);
-            GetComponent<Rigidbody>().AddForce(velocityChange, ForceMode.VelocityChange);
+            speed = velocityChange;
+            speed_change = true;
+        }
+        else
+            speed_change = false;
+    }
+    void FixedUpdate()
+    {
+        if(speed_change)
+            GetComponent<Rigidbody>().AddForce(speed, ForceMode.VelocityChange);
 
             // Jump
 /*            if (canJump && Input.GetButton("Jump"))
@@ -63,10 +73,8 @@ public class CharacterControls : MonoBehaviour {
                 GetComponent<Rigidbody>().velocity = new Vector3(velocity.x, CalculateJumpVerticalSpeed(), velocity.z);
             }
 */
-        }
-
         // We apply gravity manually for more tuning control
-        Vector3 n = new Vector3(0, -gravity * GetComponent<Rigidbody>().mass, 0);
+        Vector3 n = new Vector3(0, -Gravity * GetComponent<Rigidbody>().mass, 0);
         n = transform.rotation * n;
         GetComponent<Rigidbody>().AddForce(n);
 
@@ -82,6 +90,6 @@ public class CharacterControls : MonoBehaviour {
     {
         // From the jump height and gravity we deduce the upwards speed 
         // for the character to reach at the apex.
-        return Mathf.Sqrt(2 * jumpHeight * gravity);
+        return Mathf.Sqrt(2 * JumpHeight * Gravity);
     }
 }

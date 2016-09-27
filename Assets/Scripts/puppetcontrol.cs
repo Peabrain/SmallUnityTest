@@ -3,7 +3,22 @@ using System.Collections;
 
 public class FirstPersonController : puppet {
 
+    public float movementSpeed = 4.0f;
+    public float rotationSpeed = 5.0f;
+    public float updownLimit = 60.0f;
+    public float jumpSpeed = 2.0f;
+    public float Gravity = 10.0f;
+
+    internal float velY = 0.0f;
+    internal float rotX = 0;
+    internal float timescale = 50.0f;
+    internal bool grounded = false;
+
+    public float MaxVelocityChange = 10.0f;
+    public bool CanJump = true;
+    public float JumpHeight = 2.0f;
     public GameObject myCamera = null;
+    public bool isActiv = false;
     // Update is called once per frame
     void Awake()
     {
@@ -17,44 +32,57 @@ public class FirstPersonController : puppet {
     }
     void Update()
     {
-        SetMovementSpeed(Control());
-        if (characterController != null)
-        {
-            characterController.Move(speed * Time.deltaTime);
-        }
     }
-    public override Vector3 Control()
+    void FixedUpdate()
     {
-        // Rotation
-
-        float mouseLeftRight = Input.GetAxis("Mouse X") * rotationSpeed * Time.deltaTime * timescale;
-        transform.Rotate(0, mouseLeftRight, 0);
-
-        rotX -= Input.GetAxis("Mouse Y") * rotationSpeed * Time.deltaTime * timescale;
-        if (myCamera != null)
+        if (!isActiv) return;
+        // Calculate how fast we should be moving
+        if (grounded)
         {
-            rotX = Mathf.Clamp(rotX, -updownLimit, updownLimit);
-            myCamera.transform.localRotation = Quaternion.Euler(rotX, 0, 0);
-        }
+            Vector3 nn = new Vector3(0, 0, 0);
+            Vector3 targetVelocity = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+            targetVelocity = transform.TransformDirection(targetVelocity);
+            targetVelocity *= movementSpeed;
 
-        // Movement
-
-        float forwardSpeed = Input.GetAxis("Vertical");
-        float slideSpeed = Input.GetAxis("Horizontal");
-
-        velY += 9.81f * Time.deltaTime;
-
-        if (characterController.isGrounded)
-        {
-            velY = Time.deltaTime;
-            if (Input.GetButtonDown("Jump"))
+            float mouseLeftRight = Input.GetAxis("Mouse X") * Time.deltaTime * 200.0f;
+            transform.Rotate(0, mouseLeftRight, 0);
+            if (myCamera != null)
             {
-                //                velY = -jumpSpeed;
+                rotX -= Input.GetAxis("Mouse Y") * 100 * Time.deltaTime;
+                rotX = Mathf.Clamp(rotX, -updownLimit, updownLimit);
+                myCamera.transform.localRotation = Quaternion.Euler(rotX, 0, 0);
             }
-        }
-        Vector3 speed = new Vector3(slideSpeed, -velY, forwardSpeed);
-        speed = transform.rotation * (speed * movementSpeed);
 
-        return speed;
+            nn = transform.rotation * targetVelocity;
+
+            // Apply a force that attempts to reach our target velocity
+            Vector3 velocity = GetComponent<Rigidbody>().velocity;
+            Vector3 velocityChange = (targetVelocity - velocity);
+            GetComponent<Rigidbody>().AddForce(velocityChange, ForceMode.VelocityChange);
+        }
+
+        // Jump
+        /*            if (canJump && Input.GetButton("Jump"))
+                    {
+                        GetComponent<Rigidbody>().velocity = new Vector3(velocity.x, CalculateJumpVerticalSpeed(), velocity.z);
+                    }
+        */
+        // We apply gravity manually for more tuning control
+        Vector3 n = new Vector3(0, -Gravity * GetComponent<Rigidbody>().mass, 0);
+        n = transform.parent.rotation * n;
+        GetComponent<Rigidbody>().AddForce(n);
+
+        grounded = false;
+    }
+
+    void OnCollisionStay()
+    {
+        grounded = true;
+    }
+    float CalculateJumpVerticalSpeed()
+    {
+        // From the jump height and gravity we deduce the upwards speed 
+        // for the character to reach at the apex.
+        return Mathf.Sqrt(2 * JumpHeight * Gravity);
     }
 }
