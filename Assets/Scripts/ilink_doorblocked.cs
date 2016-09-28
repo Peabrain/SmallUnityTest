@@ -4,7 +4,7 @@ using System.Collections;
 public class ilink_doorblocked : ilink_door {
 
     public GameObject Airlock = null;
-    public override bool Accept(bool on)
+    public override bool Accept(bool on, int contID)
     {
         if (!on)
             return true;

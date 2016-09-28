@@ -68,6 +68,7 @@
     <Compile Include="Assets\Scripts\client.cs" />
     <Compile Include="Assets\Scripts\game.cs" />
     <Compile Include="Assets\Scripts\gui.cs" />
+    <Compile Include="Assets\Scripts\ilink_cockpit.cs" />
     <Compile Include="Assets\Scripts\ilink_door.cs" />
     <Compile Include="Assets\Scripts\ilink_doorblocked.cs" />
     <Compile Include="Assets\Scripts\interactionlink.cs" />

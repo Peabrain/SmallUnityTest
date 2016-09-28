@@ -4,6 +4,13 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System;
 
+// Schiffsteuerung:
+// X und Y - hoch und runter
+// W und S - Schub vorwärts und rückwärts
+// Q und E - Rollen
+// A und D - Strafen
+
+
 public class ship : channel {
 
     public int netID = 0;
@@ -35,6 +42,8 @@ public class ship : channel {
         foreach (trigger ti in trig)
         {
             ti.Init(this);
+            if (Triggers.ContainsKey(ti.netID))
+                Debug.Log("Triggerkey " + ti.netID + "error");
             Triggers[ti.netID] = ti;
             if (GetNetwork().IsClient())
             {
@@ -106,7 +115,7 @@ public class ship : channel {
                     m.gameObject.SetActive(true);
                     if(GetNetwork().IsClient())
                     {
-                        if (Input.GetMouseButtonDown(0))
+                        if (interact.GetLink().CheckInteract())
                         {
                             client c = (client)GetNetwork();
                             interact.SendRequest(c.ingameContID);
@@ -268,7 +277,6 @@ public class ship : channel {
             case (int)network_data.COMMANDS.ctrigger:
                 {
                     network_data.trigger com = network_utils.nData.Instance.DeserializeMsg<network_data.trigger>(message);
-                    Debug.Log("Get triggerdata");
                     if(Triggers.ContainsKey(com.netID))
                     {
                         trigger t = Triggers[com.netID];
@@ -277,13 +285,13 @@ public class ship : channel {
                             if(com.accept)
                             {
                                 t.SetTrigger(com.count, com.on);
-                                t.DoActivate();
+                                t.DoActivate(com.header.containerID);
                             }
                         }
                         else
                         {
-                            t.TriggerRequest();
-                            t.DoActivate();
+                            t.TriggerRequest(com.header.containerID);
+                            t.DoActivate(com.header.containerID);
                         }
                     }
                 }
@@ -352,6 +360,5 @@ public class ship : channel {
         destPos = v;
         lastRot = transform.localRotation;
         destRot = r;
-        Debug.Log("Ship rotation " + r);
     }
 }
