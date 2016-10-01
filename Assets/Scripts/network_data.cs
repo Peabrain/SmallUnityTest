@@ -25,7 +25,8 @@ namespace network_data
         ccreate_player = 14,
         cmove_player = 15,
         cdisconnect = 16,
-        ctrigger = 17
+        ctrigger = 17,
+        cflyparam = 18
     };
 
 /*    [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -434,6 +435,38 @@ namespace network_data
         private HEADER Header;
         private Vector3 Position;
         private Quaternion Rotation;
+    }
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct fly_param
+    {
+        public void set(int contID, int channel)
+        {
+            HEADER h = new HEADER();
+            h.command = (int)COMMANDS.cflyparam;
+            h.signum = SIGNUM.BIN;
+            h.containerID = contID;
+            h.channelID = channel;
+            h.size = network_utils.nData.Instance.getSize<fly_param>();
+            header = h;
+        }
+        public HEADER header
+        {
+            get { return Header; }
+            set { Header = value; }
+        }
+        public Vector3 velocity
+        {
+            get { return Velocity; }
+            set { Velocity = value; }
+        }
+        public Quaternion rotation
+        {
+            get { return Rotation; }
+            set { Rotation = value; }
+        }
+        private HEADER Header;
+        private Quaternion Rotation;
+        private Vector3 Velocity;
     }
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct disconnect

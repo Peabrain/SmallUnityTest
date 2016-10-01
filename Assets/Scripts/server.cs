@@ -89,6 +89,7 @@ public class server : network {
                 default:
                     {
                         channel c = ChannelObjectList[header.channelID].GetComponent<channel>();
+                        Debug.Log(c.name);
                         c.ProcessMessage(ref bb.data,c.gameObject.GetComponent<receiver>());
                     }
                     break;
@@ -195,6 +196,7 @@ public class server : network {
     }
     public override bool Send(int contID, byte[] byteData)
     {
+        if (socketList[contID].stream == null) return false; 
         try
         {
             if (socketList[contID].stream.CanWrite)
@@ -202,6 +204,7 @@ public class server : network {
         }
         catch (Exception e)
         {
+            Debug.Log(e);
             return false;
         }
         return true;

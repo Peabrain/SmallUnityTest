@@ -3,7 +3,7 @@ using System.Collections;
 
 public class trigger : MonoBehaviour {
 
-    bool mouseover = false;
+//    bool mouseover = false;
     channel mychannel = null;
     int counter = 0;
     bool on = false;
@@ -47,7 +47,7 @@ public class trigger : MonoBehaviour {
         }
         if (!mychannel.GetNetwork().IsClient()) SendTrigger(-1);
     }
-    void OnMouseOver()
+/*    void OnMouseOver()
     {
         mouseover = true;
     }
@@ -59,6 +59,7 @@ public class trigger : MonoBehaviour {
     {
         return mouseover;
     }
+*/
     public void SetTrigger(int count,bool on)
     {
 //        Debug.Log("Trigger " + name + " " + on);

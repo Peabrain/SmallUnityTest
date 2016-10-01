@@ -14,11 +14,26 @@ public class ship : puppet {
     GameObject myCam = null;
     channel Channel = null;
 
+    GameObject Game = null;
+
     Vector3 g = new Vector3(0, 0, 0);
 
+    public float movementSpeed = 4.0f;
+    public float Gravity = 10.0f;
+    internal bool grounded = false;
+
+    Rigidbody myrigidbody = null;
+
+    Vector3 targetVelocity = new Vector3(0,0,0);
+    Quaternion targetRotation = new Quaternion();
+
+
     // Use this for initialization
-    public void Init()
+    public void Init(GameObject Game)
     {
+        targetRotation = Quaternion.Euler(0,0,0);
+        myrigidbody = transform.FindChild("Outside").GetComponent<Rigidbody>();
+        this.Game = Game;
         Channel = this.GetComponent<channel>();
         if (!Channel)
             Debug.Log("No Channel");
@@ -56,17 +71,18 @@ public class ship : puppet {
     // Update is called once per frame
     void Update()
     {
-        if (!Channel.GetNetwork()) return;
+        if (!Channel || !Channel.GetNetwork()) return;
 
-        if(!Channel.GetNetwork().IsClient())
+        if(Channel.GetNetwork().IsClient())
         {
             InterpolateMovement();
         }
         else
         {
-            g.y += 0;// Time.deltaTime * 2;
-            Quaternion q = Quaternion.Euler(g);
-            transform.localRotation = q;
+            transform.localPosition += myrigidbody.gameObject.transform.localPosition;
+            myrigidbody.gameObject.transform.localPosition = Vector3.zero;
+            transform.localRotation *= myrigidbody.gameObject.transform.localRotation;
+            myrigidbody.gameObject.transform.localRotation = Quaternion.Euler(0,0,0);
         }
 
         DateTime now = new DateTime();
@@ -88,12 +104,12 @@ public class ship : puppet {
                 byte[] data1 = network_utils.nData.Instance.SerializeMsg<network_data.move_player>(m);
                 Channel.GetNetwork().Send(id, data1);
             }
-            network_data.move_player m2 = new network_data.move_player();
-            m2.set((int)-1, Channel.GetChannel());
-            m2.position = transform.position;
-            m2.rotation = transform.rotation;
-            byte[] data = network_utils.nData.Instance.SerializeMsg<network_data.move_player>(m2);
-            Channel.SendToChannel(ref data);
+            network_data.fly_param m2 = new network_data.fly_param();
+            m2.set(GetComponent<channel>().GetChannel(), Game.GetComponent<channel>().GetChannel());
+            m2.rotation = targetRotation;
+            m2.velocity = targetVelocity;
+            byte[] data = network_utils.nData.Instance.SerializeMsg<network_data.fly_param>(m2);
+            Game.GetComponent<channel>().GetNetwork().Send(GetComponent<channel>().GetChannel(), data);
         }
         else
         {
@@ -135,7 +151,8 @@ public class ship : puppet {
             Player.AddComponent<puppetcontrol>();
             Player.GetComponent<puppet>().InitTransform(position, rotation);// rotation);
             puppetcontrol f = Player.GetComponent<puppetcontrol>();
-            f.AddObjectToInteract(this.gameObject);
+            f.SetChannel(Channel);
+//            f.AddObjectToInteract(this.gameObject);
             GameObject GUI = GameObject.Find("GUI");
             if (GUI != null)
             {
@@ -210,11 +227,6 @@ public class ship : puppet {
                     network_data.move_player com = network_utils.nData.Instance.DeserializeMsg<network_data.move_player>(message);
                     if (Channel.GetNetwork().IsClient())
                     {
-                        if(com.header.containerID == -1)
-                        {
-                            SetTransform(com.position, com.rotation);
-                        }
-                        else
                         if (Channel.GetNetwork().GetComponent<client>().ingameContID != com.header.containerID)
                         {
                             GameObject g = Channel.GetEntity(com.header.containerID);
@@ -281,10 +293,11 @@ public class ship : puppet {
             Channel.SendToChannel(ref data1);
         }
     }
-    public trigger MouseOver()
+/*    public trigger MouseOver()
     {
         trigger ret = null;
-        if(Channel.GetNetwork().IsClient())
+
+        if (Channel.GetNetwork().IsClient())
         {
             foreach (KeyValuePair<int, trigger> j in Triggers)
             {
@@ -296,6 +309,7 @@ public class ship : puppet {
                         if (k.MouseOver())
                         {
                             Collider[] c = k.GetComponents<Collider>();
+                            ret = k;
                             Vector3 v = myCam.transform.rotation * new Vector3(0,0,1);
                             Ray ray = myCam.GetComponent<Camera>().ScreenPointToRay(new Vector3(0, 0, 0));
                             ray.direction = v;
@@ -317,16 +331,45 @@ public class ship : puppet {
         }
         return ret;
     }
-/*    public void SetTransform(Vector3 v, Quaternion r)
-    {
-        syncTime = 0f;
-        syncDelay = Time.time - lastTime;
-        lastTime = Time.time;
-
-        lastPos = transform.localPosition;
-        destPos = v;
-        lastRot = transform.localRotation;
-        destRot = r;
-    }
 */
+    void FixedUpdate()
+    {
+        if (Channel.GetNetwork().IsClient()) return;
+
+        transform.rotation = targetRotation;
+        Vector3 t = myrigidbody.gameObject.transform.rotation * targetVelocity;
+//        t = myrigidbody.gameObject.transform.rotation * t;
+        Vector3 velocity = myrigidbody.velocity;
+        Vector3 velocityChange = t - velocity;
+        myrigidbody.AddForce(velocityChange, ForceMode.VelocityChange);
+        grounded = false;
+    }
+    public void SetVelocity(Vector3 v)
+    {
+        targetVelocity = v;
+    }
+    public void SetTargetRotation(Quaternion v)
+    {
+        targetRotation = v;
+    }
+    public Quaternion GetTargetRotation()
+    {
+        return targetRotation;
+    }
+    void OnCollisionStay()
+    {
+        grounded = true;
+    }
+    /*    public void SetTransform(Vector3 v, Quaternion r)
+        {
+            syncTime = 0f;
+            syncDelay = Time.time - lastTime;
+            lastTime = Time.time;
+
+            lastPos = transform.localPosition;
+            destPos = v;
+            lastRot = transform.localRotation;
+            destRot = r;
+        }
+    */
 }

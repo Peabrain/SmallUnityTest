@@ -12,6 +12,8 @@ public class puppet : receiver {
     Quaternion lastRot;
     Quaternion destRot;
 
+    internal Vector3 Movevector = new Vector3(0, 0,0);
+
     internal bool isActiv = false;
     // Use this for initialization
     public void InitTransform(Vector3 v,Quaternion r)
@@ -52,12 +54,12 @@ public class puppet : receiver {
         syncTime = 0f;
         syncDelay = Time.time - lastTime;
         lastTime = Time.time;
-
         lastPos = transform.localPosition;
         destPos = v;
         lastRot = transform.localRotation;
         destRot = r;
     }
+
     public virtual void Control()
     {
     }
@@ -65,10 +67,8 @@ public class puppet : receiver {
     {
         isActiv = a;
     }
-    /*    public virtual Vector3 Control()
+    public void SetMoveVector(Vector3 m)
     {
-        Vector3 speed = new Vector3(0,0,0);
-        return speed;
+        Movevector = m;
     }
-*/
 }
