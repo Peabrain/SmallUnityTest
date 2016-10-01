@@ -16,7 +16,12 @@ public class trigger : MonoBehaviour {
     public void Init(channel mychannel)
     {
         this.mychannel = mychannel;
-        if (InteractionLink) link = InteractionLink.GetComponent<interactionlink>();
+        if (InteractionLink)
+        {
+            link = InteractionLink.GetComponent<interactionlink>();
+            if (link)
+                link.SetTrigger(this);
+        }
     }
 	void OnTriggerEnter(Collider other)
     {
@@ -56,7 +61,7 @@ public class trigger : MonoBehaviour {
     }
     public void SetTrigger(int count,bool on)
     {
-        Debug.Log("Trigger " + name + " " + on);
+//        Debug.Log("Trigger " + name + " " + on);
         counter = count;
         if (this.on ^ on)
             changed = true;
@@ -108,6 +113,7 @@ public class trigger : MonoBehaviour {
     }
     public void TriggerRequest(int contID)
     {
+        Debug.Log("Get Request from " + contID);
         bool on_ = this.on ^ true;
         bool accept = link.Accept(on_, contID);
         if (accept)
@@ -134,5 +140,9 @@ public class trigger : MonoBehaviour {
     public interactionlink GetLink()
     {
         return link;
+    }
+    public channel GetChannel()
+    {
+        return mychannel;
     }
 }

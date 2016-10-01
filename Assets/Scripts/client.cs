@@ -77,7 +77,7 @@ public class client : network {
                                     if(ChannelObjectList.ContainsKey(header.channelID))
                                     {
                                         channel c = ChannelObjectList[header.channelID].GetComponent<channel>();
-                                        c.ProcessMessage(ref data);
+                                        c.ProcessMessage(ref data,c.gameObject.GetComponent<receiver>());
                                     }
                                 }
                                 break;
@@ -196,5 +196,10 @@ public class client : network {
     public override void UnregisterChannelToSocketdata(int contID, int channel)
     {
         socketdata.channels.Remove(channel);
+    }
+    public void OnGUI()
+    {
+        string s = "Client contID " + ingameContID;
+        GUI.Label(new Rect(2, 10, 150, 100), s);
     }
 }

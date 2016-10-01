@@ -3473,6 +3473,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   FixPosition: {fileID: 1000013462603758}
+  User_InterfaceObj: {fileID: 1000013796377746}
 --- !u!114 &114000014070626170
 MonoBehaviour:
   m_ObjectHideFlags: 1

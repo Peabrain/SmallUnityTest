@@ -9,6 +9,7 @@ using System;
 public class interactionlink : MonoBehaviour {
 
     public GameObject FixPosition = null;
+    internal trigger Trigger = null;
     // Use this for initialization
     void Start () {
     }
@@ -16,11 +17,6 @@ public class interactionlink : MonoBehaviour {
     // Update is called once per frame
     void Update ()
     {
-    }
-
-    public bool CheckInteract()
-    {
-        return Input.GetKeyDown(KeyCode.F);
     }
 
     public virtual bool Accept(bool on,int contID)
@@ -40,5 +36,13 @@ public class interactionlink : MonoBehaviour {
     }
     public virtual void Deactivate()
     {
+    }
+    public void SetTrigger(trigger t)
+    {
+        Trigger = t;
+    }
+    public trigger GetTrigger()
+    {
+        return Trigger;
     }
 }

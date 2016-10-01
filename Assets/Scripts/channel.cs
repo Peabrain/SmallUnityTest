@@ -19,8 +19,9 @@ public class channel : MonoBehaviour
     {
     }
 
-    public virtual void ProcessMessage(ref byte[] message)
+    public void ProcessMessage(ref byte[] message,receiver rec)
     {
+        if (rec) rec.ProcessMessage(ref message);
     }
     public void SetChannel(int ch)
     {

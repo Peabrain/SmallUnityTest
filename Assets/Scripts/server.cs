@@ -89,7 +89,7 @@ public class server : network {
                 default:
                     {
                         channel c = ChannelObjectList[header.channelID].GetComponent<channel>();
-                        c.ProcessMessage(ref bb.data);
+                        c.ProcessMessage(ref bb.data,c.gameObject.GetComponent<receiver>());
                     }
                     break;
             }

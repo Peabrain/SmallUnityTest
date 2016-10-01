@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class puppet : MonoBehaviour {
+public class puppet : receiver {
 
     float lastTime = 0;
     float syncTime = 0;
@@ -11,9 +11,12 @@ public class puppet : MonoBehaviour {
     Vector3 destPos = new Vector3(0, 0, 0);
     Quaternion lastRot;
     Quaternion destRot;
+
+    internal bool isActiv = false;
     // Use this for initialization
     public void InitTransform(Vector3 v,Quaternion r)
     {
+        syncDelay = 0f;
         lastTime = Time.time;
         lastPos = v;
         destPos = lastPos;
@@ -33,9 +36,16 @@ public class puppet : MonoBehaviour {
     // Update is called once per frame
     void Update()
     {
+        InterpolateMovement();
+    }
+    internal void InterpolateMovement()
+    {
         syncTime += Time.deltaTime;
-        transform.localPosition = Vector3.Lerp(lastPos, destPos, syncTime / syncDelay);
-        transform.localRotation = Quaternion.Lerp(lastRot, destRot, syncTime / syncDelay);
+        if (syncDelay > 0.0f)
+        {
+            transform.localPosition = Vector3.Lerp(lastPos, destPos, syncTime / syncDelay);
+            transform.localRotation = Quaternion.Lerp(lastRot, destRot, syncTime / syncDelay);
+        }
     }
     public void SetTransform(Vector3 v,Quaternion r)
     {
@@ -47,6 +57,13 @@ public class puppet : MonoBehaviour {
         destPos = v;
         lastRot = transform.localRotation;
         destRot = r;
+    }
+    public virtual void Control()
+    {
+    }
+    public virtual void SetActiv(bool a)
+    {
+        isActiv = a;
     }
     /*    public virtual Vector3 Control()
     {

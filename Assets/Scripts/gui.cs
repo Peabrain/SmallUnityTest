@@ -1,11 +1,16 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class gui : MonoBehaviour {
 
     // Use this for initialization
     private bool isAtStartup = true;
+    bool isClient = false;
     public string myserver;
+    List<GameObject> userInterfaceList = new List<GameObject>();
+    GameObject game = null;
+    
     void Awake()
     {
         string[] sys = System.Environment.GetCommandLineArgs();
@@ -13,13 +18,17 @@ public class gui : MonoBehaviour {
         {
             if (s == "-batchmode")
             {
-                var go = new GameObject();
-                go.name = "game";
-                go.AddComponent<game>();
-                go.AddComponent<server>();
-                network n = go.GetComponent<network>();
-                n.AddGameObjectToChannel(go);
-                go.GetComponent<game>().LoadShip("Prefabs/Ship1", "Ship");
+                game = new GameObject();
+                game.name = "game";
+                game.AddComponent<game>();
+                channel ss = game.AddComponent<channel>();
+                game.AddComponent<server>();
+                network n = game.GetComponent<network>();
+                int t = n.AddGameObjectToChannel(game);
+                ss.SetNetwork(n);
+                ss.SetChannel(t);
+                game.GetComponent<game>().Init();
+                game.GetComponent<game>().LoadShip("Prefabs/Ship1", "Ship");
                 isAtStartup = false;
                 break;
             }
@@ -34,26 +43,35 @@ public class gui : MonoBehaviour {
         {
             if (Input.GetKeyDown(KeyCode.S))
             {
-                var go = new GameObject();
-                go.name = "game";
-                go.AddComponent<game>();
-                go.AddComponent<server>();
-                network n = go.GetComponent<network>();
-                n.AddGameObjectToChannel(go);
-                go.GetComponent<game>().LoadShip("Prefabs/Ship1", "Ship");
+                game = new GameObject();
+                game.name = "game";
+                game.AddComponent<game>();
+                channel s = game.AddComponent<channel>();
+                game.AddComponent<server>();
+                network n = game.GetComponent<network>();
+                int t = n.AddGameObjectToChannel(game);
+                s.SetNetwork(n);
+                s.SetChannel(t);
+                game.GetComponent<game>().Init();
+                game.GetComponent<game>().LoadShip("Prefabs/Ship1", "Ship");
                 isAtStartup = false;
             }
 
             if (Input.GetKeyDown(KeyCode.C))
             {
-                var go = new GameObject();
-                go.name = "game";
-                go.AddComponent<game>();
-                go.AddComponent<client>();
-                go.GetComponent<client>().Connect(myserver);
-                network n = go.GetComponent<network>();
-                n.AddGameObjectToChannel(go);
-                go.GetComponent<game>().LoadShip("Prefabs/Ship1", "Ship");
+                isClient = true;
+                game = new GameObject();
+                game.name = "game";
+                game.AddComponent<game>();
+                channel s = game.AddComponent<channel>();
+                game.AddComponent<client>();
+                network n = game.GetComponent<network>();
+                int t = n.AddGameObjectToChannel(game);
+                s.SetNetwork(n);
+                s.SetChannel(t);
+                game.GetComponent<game>().Init();
+                game.GetComponent<client>().Connect(myserver);
+                game.GetComponent<game>().LoadShip("Prefabs/Ship1", "Ship");
                 isAtStartup = false;
                 Cursor.lockState = CursorLockMode.Locked;
             }
@@ -70,5 +88,66 @@ public class gui : MonoBehaviour {
         }
         //      else
         //           network.GetComponent<network>().OnGUI();
+    }
+    public bool PushUserInterface(GameObject obj)
+    {
+        if (!isClient) return true;
+        if (!userInterfaceList.Contains(obj))
+        {
+            puppet ui = obj.GetComponent<puppet>();
+            if (ui)
+            {
+                if (userInterfaceList.Count != 0)
+                {
+                    GameObject obj_last = userInterfaceList[userInterfaceList.Count - 1];
+                    if (obj_last)
+                    {
+                        puppet ui_last = obj_last.GetComponent<puppet>();
+                        if (ui_last)
+                            ui_last.SetActiv(false);
+                    }
+                }
+                ui.SetActiv(true);
+                userInterfaceList.Add(obj);
+                return true;
+            }
+        }
+        return false;
+    }
+    public void PopUserInterface()
+    {
+        if (!isClient) return;
+        if (userInterfaceList.Count > 0)
+        {
+            GameObject obj_last = userInterfaceList[userInterfaceList.Count - 1];
+            if (obj_last)
+            {
+                puppet ui_last = obj_last.GetComponent<puppet>();
+                if (ui_last)
+                {
+                    ui_last.SetActiv(false);
+                    userInterfaceList.Remove(obj_last);
+                }
+                GameObject obj = userInterfaceList[userInterfaceList.Count - 1];
+                if (obj)
+                {
+                    puppet ui = obj.GetComponent<puppet>();
+                    if (ui)
+                    {
+                        ui.SetActiv(true);
+                    }
+                }
+            }
+        }
+    }
+    public bool IsClient()
+    {
+        return isClient;
+    }
+    public int GetClientContID()
+    {
+        if (isClient)
+            return game.GetComponent<client>().ingameContID;
+        return -1;
     }
 }

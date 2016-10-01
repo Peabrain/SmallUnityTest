@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
-public class FirstPersonController : puppet {
+public class puppetcontrol : puppet {
 
     public float movementSpeed = 4.0f;
     public float rotationSpeed = 5.0f;
@@ -17,8 +18,12 @@ public class FirstPersonController : puppet {
     public float MaxVelocityChange = 10.0f;
     public bool CanJump = true;
     public float JumpHeight = 2.0f;
-    public GameObject myCamera = null;
-    public bool isActiv = false;
+
+    GameObject myCamera = null;
+    Dictionary<int,GameObject> ObjectToInteractWith = new Dictionary<int, GameObject>();
+    Vector2 Mousevector;
+    Vector2 Movevector;
+    GameObject UI = null;
     // Update is called once per frame
     void Awake()
     {
@@ -29,9 +34,42 @@ public class FirstPersonController : puppet {
             //           var head = transform.FindChild("Geo/Head");
             //            head.gameObject.SetActive(false);
         }
+        UI = GameObject.Find("UI");
+        if (UI != null)
+            Debug.Log("Found UI");
     }
     void Update()
     {
+        if (!isActiv) return;
+        Movevector = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+
+        UpdateCamera();
+
+        if (UI != null)
+        {
+            foreach(KeyValuePair<int,GameObject> obj in ObjectToInteractWith)
+            {
+                trigger interact = obj.Value.GetComponent<ship>().MouseOver();
+                if (interact != null)
+                {
+                    Transform m = UI.transform.FindChild("Cursor_Use");
+                    m.gameObject.SetActive(true);
+                    if (obj.Value.GetComponent<ship>().GetComponent<channel>().GetNetwork().IsClient())
+                    {
+                        client c = (client)obj.Value.GetComponent<ship>().GetComponent<channel>().GetNetwork();
+                        if (Input.GetKeyDown(KeyCode.F))
+                        {
+                            interact.SendRequest(c.ingameContID);
+                        }
+                    }
+                }
+                else
+                {
+                    Transform m = UI.transform.FindChild("Cursor_Use");
+                    m.gameObject.SetActive(false);
+                }
+            }
+        }
     }
     void FixedUpdate()
     {
@@ -40,18 +78,9 @@ public class FirstPersonController : puppet {
         if (grounded)
         {
             Vector3 nn = new Vector3(0, 0, 0);
-            Vector3 targetVelocity = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+            Vector3 targetVelocity = new Vector3(Movevector.x, 0, Movevector.y);
             targetVelocity = transform.TransformDirection(targetVelocity);
             targetVelocity *= movementSpeed;
-
-            float mouseLeftRight = Input.GetAxis("Mouse X") * Time.deltaTime * 200.0f;
-            transform.Rotate(0, mouseLeftRight, 0);
-            if (myCamera != null)
-            {
-                rotX -= Input.GetAxis("Mouse Y") * 100 * Time.deltaTime;
-                rotX = Mathf.Clamp(rotX, -updownLimit, updownLimit);
-                myCamera.transform.localRotation = Quaternion.Euler(rotX, 0, 0);
-            }
 
             nn = transform.rotation * targetVelocity;
 
@@ -84,5 +113,40 @@ public class FirstPersonController : puppet {
         // From the jump height and gravity we deduce the upwards speed 
         // for the character to reach at the apex.
         return Mathf.Sqrt(2 * JumpHeight * Gravity);
+    }
+    public void AddObjectToInteract(GameObject obj)
+    {
+        ObjectToInteractWith[obj.GetComponent<channel>().GetChannel()] = obj;
+    }
+    public override void SetActiv(bool a)
+    {
+        base.SetActiv(a);
+        if(isActiv == false)
+        {
+            Mousevector = new Vector2(0, 0);
+            Movevector = new Vector2(0,0);
+        }
+    }
+    public void UpdateCamera()
+    {
+        if (myCamera != null)
+        {
+            Mousevector = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
+            rotX -= Mousevector.y * 100 * Time.deltaTime;
+            rotX = Mathf.Clamp(rotX, -updownLimit, updownLimit);
+            myCamera.transform.localRotation = Quaternion.Euler(rotX, 0, 0);
+
+            float mouseLeftRight = Mousevector.x * Time.deltaTime * 200.0f;
+            transform.Rotate(0, mouseLeftRight, 0);
+        }
+    }
+    public void CameraReset()
+    {
+        rotX = 0;
+        rotX = Mathf.Clamp(rotX, -updownLimit, updownLimit);
+        myCamera.transform.localRotation = Quaternion.Euler(rotX, 0, 0);
+
+        float mouseLeftRight = 0;
+        transform.Rotate(0, mouseLeftRight, 0);
     }
 }
