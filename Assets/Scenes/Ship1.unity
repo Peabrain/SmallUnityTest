@@ -102,7 +102,7 @@ GameObject:
   - 33: {fileID: 695514289}
   - 64: {fileID: 695514288}
   - 23: {fileID: 695514287}
-  m_Layer: 10
+  m_Layer: 11
   m_Name: Plane
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -148,7 +148,7 @@ MeshCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Convex: 1
+  m_Convex: 0
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!33 &695514289
 MeshFilter:
