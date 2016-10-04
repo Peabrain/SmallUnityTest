@@ -51,6 +51,7 @@ public class game : receiver {
                     GameObject g = (GameObject)i.Value;
                     m.set((int)i.Key, Channel.GetChannel());
                     m.position = ((GameObject)i.Value).transform.localPosition;
+                    m.velocity = ((GameObject)i.Value).GetComponent<ship>().GetVelocity();
                     m.rotation = ((GameObject)i.Value).transform.localRotation;
                     byte[] data1 = network_utils.nData.Instance.SerializeMsg<network_data.move_player>(m);
 
@@ -70,8 +71,36 @@ public class game : receiver {
             case (int)network_data.COMMANDS.cmove_player:
                 {
                     network_data.move_player com = network_utils.nData.Instance.DeserializeMsg<network_data.move_player>(message);
-                    Debug.Log(com.position);
                     if (Channel.GetNetwork().IsClient())
+                    {
+                        GameObject g = Channel.GetEntity(com.header.containerID);
+                        ship s = g.GetComponent<ship>();
+                        if (s != null)
+                        {
+                            if (!s.IsCockpitUsedByMe())
+                            {
+                                g.GetComponent<ship>().SetTransform(com.position, com.rotation,puppet.trans_flag_position | puppet.trans_flag_rotation);
+                                g.GetComponent<ship>().SetMoveVector(com.position);
+                                g.GetComponent<ship>().SetVelocity(com.velocity);
+                            }
+                            else
+                                g.GetComponent<ship>().SetTransform(com.position, com.rotation, puppet.trans_flag_position);
+                        }
+                    }
+                    else
+                    {
+                        //                        g.transform.rotation = com.rotation;
+                        GameObject g = Channel.GetEntity(com.header.containerID);
+                        g.GetComponent<ship>().SetTransform(com.position, com.rotation, puppet.trans_flag_rotation);
+                        //                        g.GetComponent<ship>().SetTransform(com.position,com.rotation);
+                        g.GetComponent<ship>().SetMoveVector(com.position);
+                        g.GetComponent<ship>().SetVelocity(com.velocity);
+                        byte[] data1 = network_utils.nData.Instance.SerializeMsg<network_data.move_player>(com);
+//                        g.GetComponent<ship>().GetChannel().SendToChannel(ref data1);
+                    }
+
+
+/*                    if (Channel.GetNetwork().IsClient())
                     {
                         int ownid = Channel.GetNetwork().GetComponent<client>().ingameContID;
                         GameObject g = Channel.GetEntity(com.header.containerID);
@@ -82,26 +111,14 @@ public class game : receiver {
                     }
                     else
                     {
-/*                        GameObject g = Channel.GetEntity(com.header.containerID);
+                        GameObject g = Channel.GetEntity(com.header.containerID);
                         if (g != null)
                         {
                             g.GetComponent<puppet>().SetTransform(com.position, com.rotation);
                             g.GetComponent<ship>().SetVelocity(com.velocity);
                         }
+                    }
 */
-                    }
-                }
-                break;
-            case (int)network_data.COMMANDS.cflyparam:
-                {
-                    network_data.fly_param com = network_utils.nData.Instance.DeserializeMsg<network_data.fly_param>(message);
-                    GameObject g = Channel.GetEntity(com.header.containerID);
-                    if (g != null)
-                    {
-//                        g.transform.rotation = com.rotation;
-                        g.GetComponent<ship>().SetTargetRotation(com.rotation);
-                        g.GetComponent<ship>().SetVelocity(com.velocity);
-                    }
                 }
                 break;
         }

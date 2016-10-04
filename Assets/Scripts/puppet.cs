@@ -3,6 +3,9 @@ using System.Collections;
 
 public class puppet : receiver {
 
+    public const int trans_flag_position = 1;
+    public const int trans_flag_rotation = 2;
+
     float lastTime = 0;
     float syncTime = 0;
     float syncDelay = 0;
@@ -38,26 +41,31 @@ public class puppet : receiver {
     // Update is called once per frame
     void Update()
     {
-        InterpolateMovement();
+        InterpolateMovement(puppet.trans_flag_position | puppet.trans_flag_rotation);
     }
-    internal void InterpolateMovement()
+    internal void InterpolateMovement(int flags)
     {
         syncTime += Time.deltaTime;
         if (syncDelay > 0.0f)
         {
-            transform.localPosition = Vector3.Lerp(lastPos, destPos, syncTime / syncDelay);
-            transform.localRotation = Quaternion.Lerp(lastRot, destRot, syncTime / syncDelay);
+            if ((flags & trans_flag_position) == trans_flag_position)
+                transform.localPosition = Vector3.Lerp(lastPos, destPos, syncTime / syncDelay);
+            if ((flags & trans_flag_rotation) == trans_flag_rotation)
+                transform.localRotation = Quaternion.Lerp(lastRot, destRot, syncTime / syncDelay);
         }
     }
-    public void SetTransform(Vector3 v,Quaternion r)
+    public void SetTransform(Vector3 v,Quaternion r,int flags)
     {
         syncTime = 0f;
         syncDelay = Time.time - lastTime;
         lastTime = Time.time;
         lastPos = transform.localPosition;
-        destPos = v;
         lastRot = transform.localRotation;
-        destRot = r;
+        if ((flags & trans_flag_position) == trans_flag_position)
+            destPos = v;
+
+        if ((flags & trans_flag_rotation) == trans_flag_rotation)
+            destRot = r;
     }
 
     public virtual void Control()

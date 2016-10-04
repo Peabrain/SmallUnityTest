@@ -24,16 +24,20 @@ public class ship : puppet {
 
     Rigidbody myrigidbody = null;
 
-    Vector3 targetVelocity = new Vector3(0,0,0);
-    Quaternion targetRotation = new Quaternion();
+    Vector3 targetVelocity = new Vector3(0, 0, 0);
+//    Quaternion targetRotation = new Quaternion();
 
+    ilink_cockpit [] cockpits = null;
 
     // Use this for initialization
     public void Init(GameObject Game)
     {
-        targetRotation = Quaternion.Euler(0,0,0);
+//        targetRotation = Quaternion.Euler(0,0,0);
         myrigidbody = transform.FindChild("Outside").GetComponent<Rigidbody>();
         this.Game = Game;
+
+        cockpits = transform.GetComponentsInChildren<ilink_cockpit>();
+        Debug.Log("found " + cockpits.Length + " cockpits");
         Channel = this.GetComponent<channel>();
         if (!Channel)
             Debug.Log("No Channel");
@@ -68,21 +72,33 @@ public class ship : puppet {
     {
     }
 
+    public channel GetChannel()
+    {
+        return Channel;
+    }
     // Update is called once per frame
     void Update()
     {
         if (!Channel || !Channel.GetNetwork()) return;
 
-        if(Channel.GetNetwork().IsClient())
+        if(!Channel.GetNetwork().IsClient())
         {
-            InterpolateMovement();
+            InterpolateMovement(puppet.trans_flag_rotation);
+            transform.localPosition += myrigidbody.gameObject.transform.localPosition;
+            myrigidbody.gameObject.transform.localPosition = Vector3.zero;
+//            transform.localRotation *= myrigidbody.gameObject.transform.localRotation;
+//            myrigidbody.gameObject.transform.localRotation = Quaternion.Euler(0, 0, 0);
         }
         else
         {
-            transform.localPosition += myrigidbody.gameObject.transform.localPosition;
-            myrigidbody.gameObject.transform.localPosition = Vector3.zero;
-            transform.localRotation *= myrigidbody.gameObject.transform.localRotation;
-            myrigidbody.gameObject.transform.localRotation = Quaternion.Euler(0,0,0);
+            if(!IsCockpitUsedByMe())
+                InterpolateMovement(puppet.trans_flag_position | puppet.trans_flag_rotation);
+            else
+            {
+                InterpolateMovement(puppet.trans_flag_position);
+                transform.localRotation *= myrigidbody.gameObject.transform.localRotation;
+                myrigidbody.gameObject.transform.localRotation = Quaternion.Euler(0, 0, 0);
+            }
         }
 
         DateTime now = new DateTime();
@@ -103,13 +119,18 @@ public class ship : puppet {
                 m.rotation = g.transform.localRotation;
                 byte[] data1 = network_utils.nData.Instance.SerializeMsg<network_data.move_player>(m);
                 Channel.GetNetwork().Send(id, data1);
+
+                if (IsCockpitUsedByMe())
+                {
+                    network_data.move_player m2 = new network_data.move_player();
+                    m2.set(GetComponent<channel>().GetChannel(), Game.GetComponent<channel>().GetChannel());
+                    m2.position = transform.localPosition;
+                    m2.rotation = transform.localRotation;
+                    m2.velocity = targetVelocity;
+                    byte[] data = network_utils.nData.Instance.SerializeMsg<network_data.move_player>(m2);
+                    Game.GetComponent<channel>().GetNetwork().Send(GetComponent<channel>().GetChannel(), data);
+                }
             }
-            network_data.fly_param m2 = new network_data.fly_param();
-            m2.set(GetComponent<channel>().GetChannel(), Game.GetComponent<channel>().GetChannel());
-            m2.rotation = targetRotation;
-            m2.velocity = targetVelocity;
-            byte[] data = network_utils.nData.Instance.SerializeMsg<network_data.fly_param>(m2);
-            Game.GetComponent<channel>().GetNetwork().Send(GetComponent<channel>().GetChannel(), data);
         }
         else
         {
@@ -164,7 +185,7 @@ public class ship : puppet {
             Player.AddComponent<puppet>();
             Player.GetComponent<puppet>().InitTransform(position, rotation);// rotation);
         }
-        Player.GetComponent<puppet>().SetTransform(position, rotation);
+        Player.GetComponent<puppet>().SetTransform(position, rotation,puppet.trans_flag_position | puppet.trans_flag_rotation);
         if (Player) Debug.Log("Enter Ship (" + Channel.GetChannel() + ")" + " player " + contID + " pos: " + position + " rot:" + re.x + "," + re.y + "," + re.z);
 
         if(IsClient == false)
@@ -232,7 +253,7 @@ public class ship : puppet {
                             GameObject g = Channel.GetEntity(com.header.containerID);
                             if (g != null)
                             {
-                                g.GetComponent<puppet>().SetTransform(com.position, com.rotation);
+                                g.GetComponent<puppet>().SetTransform(com.position, com.rotation, puppet.trans_flag_position | puppet.trans_flag_rotation);
                             }
                         }
                     }
@@ -241,7 +262,7 @@ public class ship : puppet {
                         GameObject g = Channel.GetEntity(com.header.containerID);
                         if (g != null)
                         {
-                            g.GetComponent<puppet>().SetTransform(com.position,com.rotation);
+                            g.GetComponent<puppet>().SetTransform(com.position,com.rotation, puppet.trans_flag_position | puppet.trans_flag_rotation);
                         }
                     }
                 }
@@ -336,7 +357,7 @@ public class ship : puppet {
     {
         if (Channel.GetNetwork().IsClient()) return;
 
-        transform.rotation = targetRotation;
+//        transform.rotation = targetRotation;
         Vector3 t = myrigidbody.gameObject.transform.rotation * targetVelocity;
 //        t = myrigidbody.gameObject.transform.rotation * t;
         Vector3 velocity = myrigidbody.velocity;
@@ -348,17 +369,38 @@ public class ship : puppet {
     {
         targetVelocity = v;
     }
-    public void SetTargetRotation(Quaternion v)
+    public Vector3 GetVelocity()
     {
-        targetRotation = v;
+        return targetVelocity;
     }
-    public Quaternion GetTargetRotation()
-    {
-        return targetRotation;
-    }
+    /*    public void SetTargetRotation(Quaternion v)
+            {
+                targetRotation = v;
+            }
+            public Quaternion GetTargetRotation()
+            {
+                return targetRotation;
+            }
+        */
     void OnCollisionStay()
     {
         grounded = true;
+    }
+    public bool IsCockpitUsedByMe()
+    {
+        if(cockpits != null && Channel.GetNetwork().IsClient())
+        {
+            client cl = (client)Channel.GetNetwork();
+            int contID = cl.ingameContID;
+            foreach(ilink_cockpit c in cockpits)
+            {
+                if(c.GetUserID() == contID)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
     /*    public void SetTransform(Vector3 v, Quaternion r)
         {

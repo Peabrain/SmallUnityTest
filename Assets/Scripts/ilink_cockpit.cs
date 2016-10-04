@@ -36,12 +36,10 @@ public class ilink_cockpit : interactionlink
                 {
                     Mousevector = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
                     rotX -= Mousevector.y * 100 * Time.deltaTime;
-                    //        rotX = Mathf.Clamp(rotX, -updownLimit, updownLimit);
-                    //        transform.localRotation = Quaternion.Euler(rotX, 0, 0);
                     float mouseLeftRight = Mousevector.x * Time.deltaTime * 200.0f;
-                    Quaternion q = User_InterfaceObj.GetComponent<ship>().GetTargetRotation();//.transform.rotation;
+                    Quaternion q = User_InterfaceObj.transform.rotation;
                     q = q * Quaternion.Euler(new Vector3(0, mouseLeftRight, 0));
-                    User_InterfaceObj.GetComponent<ship>().SetTargetRotation(q);
+                    User_InterfaceObj.GetComponent<ship>().transform.localRotation = q;
                 }
 
                 float updown = 0f;
@@ -55,7 +53,7 @@ public class ilink_cockpit : interactionlink
 
                 Vector3 targetVelocity = Movevector;
                 targetVelocity = User_InterfaceObj.transform.rotation * targetVelocity;
-//                targetVelocity = User_InterfaceObj.transform.rotation * targetVelocity;
+                //                targetVelocity = User_InterfaceObj.transform.rotation * targetVelocity;
                 targetVelocity *= 10.0f;// movementSpeed;
                 User_InterfaceObj.GetComponent<ship>().SetVelocity(targetVelocity);
             }
@@ -107,7 +105,10 @@ public class ilink_cockpit : interactionlink
                 {
                     int c = GUI.GetComponent<gui>().GetClientContID();
                     if (c == contID)
+                    {
                         user_obj = null;
+                        User_InterfaceObj.GetComponent<puppet>().SetTransform(User_InterfaceObj.transform.localPosition, User_InterfaceObj.transform.localRotation, puppet.trans_flag_position | puppet.trans_flag_rotation);
+                    }
                 }
                 return true;
             }
