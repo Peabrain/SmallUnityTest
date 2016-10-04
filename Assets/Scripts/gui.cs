@@ -84,7 +84,7 @@ public class gui : MonoBehaviour {
             GUI.Label(new Rect(2, 10, 150, 100), "Press S for server");
             //            GUI.Label(new Rect(2, 30, 150, 100), "Press B for both");
             GUI.Label(new Rect(2, 50, 150, 100), "Press C for client");
-            myserver = GUI.TextField(new Rect(2, 90, 150, 20), "localhost");
+            myserver = GUI.TextField(new Rect(2, 90, 150, 20), myserver,25);
         }
         //      else
         //           network.GetComponent<network>().OnGUI();

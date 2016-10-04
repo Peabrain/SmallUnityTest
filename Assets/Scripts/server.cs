@@ -27,6 +27,7 @@ public class server : network {
     void Awake()
     {
         Debug.Log("Create Server");
+        Console.WriteLine("Create Server");
         socketList = new List<SocketData>();
         socketFreeIDList = new List<int>();
         socketUsedIDList = new List<int>();
@@ -112,6 +113,7 @@ public class server : network {
             listener.Start();
             listener.BeginAcceptTcpClient(new AsyncCallback(Listen), listener);
             Debug.Log("Waiting for a Game connection...");
+            Console.WriteLine("Waiting for a Game connection...");
         }
         catch (Exception e)
         {
@@ -146,9 +148,11 @@ public class server : network {
         {
             beginning = true;
             Debug.Log("Begin Game");
+            Console.WriteLine("Begin Game");
         }
 
         Debug.Log("Connect Game");
+        Console.WriteLine("Connect Game");
         if (beginning == false)
             listener.BeginAcceptTcpClient(new AsyncCallback(Listen), listener);
     }
