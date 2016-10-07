@@ -91,12 +91,17 @@ public class game : receiver {
                     {
                         //                        g.transform.rotation = com.rotation;
                         GameObject g = Channel.GetEntity(com.header.containerID);
-                        g.GetComponent<ship>().SetTransform(com.position, com.rotation, puppet.trans_flag_rotation);
-                        //                        g.GetComponent<ship>().SetTransform(com.position,com.rotation);
-                        g.GetComponent<ship>().SetMoveVector(com.position);
-                        g.GetComponent<ship>().SetVelocity(com.velocity);
-                        byte[] data1 = network_utils.nData.Instance.SerializeMsg<network_data.move_player>(com);
-//                        g.GetComponent<ship>().GetChannel().SendToChannel(ref data1);
+                        if (g == null)
+                            Debug.Log("ShipID " + com.header.containerID + " not found");
+                        else
+                        {
+                            g.GetComponent<ship>().SetTransform(com.position, com.rotation, puppet.trans_flag_rotation);
+                            //                        g.GetComponent<ship>().SetTransform(com.position,com.rotation);
+                            g.GetComponent<ship>().SetMoveVector(com.position);
+                            g.GetComponent<ship>().SetVelocity(com.velocity);
+                            byte[] data1 = network_utils.nData.Instance.SerializeMsg<network_data.move_player>(com);
+                            //                        g.GetComponent<ship>().GetChannel().SendToChannel(ref data1);
+                        }
                     }
 
 
@@ -129,7 +134,10 @@ public class game : receiver {
         channel s = Ship.GetComponent<channel>();
         Ship.GetComponent<puppet>().InitTransform(Ship.transform.localPosition, Ship.transform.localRotation);// rotation);
         network n = GameObject.FindObjectOfType<network>();
-        int t = n.AddGameObjectToChannel(Ship);
+        int unikID = 1;
+        if(!Channel.GetNetwork().IsClient())
+            unikID = GetComponent<server>().GetFreeID();
+        int t = n.AddGameObjectToChannel(Ship, unikID);
         s.SetNetwork(n);
         s.SetChannel(t);
         Channel.RegisterEntity(Ship, s.GetChannel());

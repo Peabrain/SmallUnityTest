@@ -24,7 +24,7 @@ public class gui : MonoBehaviour {
                 channel ss = game.AddComponent<channel>();
                 game.AddComponent<server>();
                 network n = game.GetComponent<network>();
-                int t = n.AddGameObjectToChannel(game);
+                int t = n.AddGameObjectToChannel(game,game.GetComponent<server>().GetFreeID());
                 ss.SetNetwork(n);
                 ss.SetChannel(t);
                 game.GetComponent<game>().Init();
@@ -49,7 +49,7 @@ public class gui : MonoBehaviour {
                 channel s = game.AddComponent<channel>();
                 game.AddComponent<server>();
                 network n = game.GetComponent<network>();
-                int t = n.AddGameObjectToChannel(game);
+                int t = n.AddGameObjectToChannel(game, game.GetComponent<server>().GetFreeID());
                 s.SetNetwork(n);
                 s.SetChannel(t);
                 game.GetComponent<game>().Init();
@@ -66,7 +66,7 @@ public class gui : MonoBehaviour {
                 channel s = game.AddComponent<channel>();
                 game.AddComponent<client>();
                 network n = game.GetComponent<network>();
-                int t = n.AddGameObjectToChannel(game);
+                int t = n.AddGameObjectToChannel(game,0);
                 s.SetNetwork(n);
                 s.SetChannel(t);
                 game.GetComponent<game>().Init();

@@ -121,6 +121,18 @@ public class server : network {
         }
     }
 
+    public int GetFreeID()
+    {
+        int id = socketFreeIDList[0];
+        socketFreeIDList.RemoveAt(0);
+        return id;
+    }
+    public void AddFreeID(int id)
+    {
+        socketUsedIDList.Remove(id);
+        socketFreeIDList.Add(id);
+    }
+
     public void Listen(IAsyncResult ar)
     {
         TcpListener listener = (TcpListener)ar.AsyncState;
@@ -131,8 +143,7 @@ public class server : network {
             socketFreeIDList.Add(socketList.Count);
             socketList.Add(new SocketData());
         }
-        int id = socketFreeIDList[0];
-        socketFreeIDList.RemoveAt(0);
+        int id = GetFreeID();
         socketList[id].socket = client;
         socketList[id].stream = client.GetStream();
         socketList[id].setTime();
@@ -240,8 +251,7 @@ public class server : network {
         {
             int id = socketUsedIDList[delList[i]];
             SocketData so = socketList[id];
-            socketUsedIDList.Remove(id);
-            socketFreeIDList.Add(id);
+            AddFreeID(id);
             Debug.Log("Disconnect from Game " + id);
             while(so.channels.Count > 0)
             {

@@ -33,11 +33,9 @@ public class network : MonoBehaviour {
     };
 
     internal Dictionary<int, GameObject> ChannelObjectList = new Dictionary<int, GameObject>();
-    int nextchannel = 0;
 
-    public int AddGameObjectToChannel(GameObject g)
+    public int AddGameObjectToChannel(GameObject g,int c)
     {
-        int c = nextchannel++;
         ChannelObjectList[c] = g;
         return c;
     }

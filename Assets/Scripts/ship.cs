@@ -6,7 +6,7 @@ using System;
 
 public class ship : puppet {
 
-    public int netID = 0;
+    public int ShipContID = -1;
     public List<GameObject> Spawnpoints = new List<GameObject>();
     int spos = 0;
     Dictionary<int, trigger> Triggers = new Dictionary<int, trigger>();
@@ -32,7 +32,7 @@ public class ship : puppet {
     // Use this for initialization
     public void Init(GameObject Game)
     {
-//        targetRotation = Quaternion.Euler(0,0,0);
+        //        targetRotation = Quaternion.Euler(0,0,0);
         myrigidbody = transform.FindChild("Outside").GetComponent<Rigidbody>();
         this.Game = Game;
 
@@ -67,6 +67,7 @@ public class ship : puppet {
             }
         }
         Debug.Log("Found " + Triggers.Count + " triggers");
+        Debug.Log("Create ShipID " + GetChannel().GetChannel());
     }
     void Start ()
     {
@@ -123,7 +124,7 @@ public class ship : puppet {
                 if (IsCockpitUsedByMe())
                 {
                     network_data.move_player m2 = new network_data.move_player();
-                    m2.set(GetComponent<channel>().GetChannel(), Game.GetComponent<channel>().GetChannel());
+                    m2.set(ShipContID, Game.GetComponent<channel>().GetChannel());
                     m2.position = transform.localPosition;
                     m2.rotation = transform.localRotation;
                     m2.velocity = targetVelocity;

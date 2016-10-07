@@ -87,9 +87,9 @@ public class ilink_cockpit : interactionlink
                         GameObject UI = GameObject.Find("UI");
                         Transform m = UI.transform.FindChild("Cursor_Use");
                         m.gameObject.SetActive(false);
+                        Debug.Log("user (" + user + ") enter cockpit");
                     }
                 }
-                Debug.Log("user (" + user + ") enter cockpit");
                 return true;
             }
         }
@@ -98,7 +98,6 @@ public class ilink_cockpit : interactionlink
             if(contID == user)
             {
                 this.on = on;
-                Debug.Log("user (" + user + ") leave cockpit");
                 user = -1;
                 GameObject GUI = GameObject.Find("GUI");
                 if (GUI != null)
@@ -108,6 +107,7 @@ public class ilink_cockpit : interactionlink
                     {
                         user_obj = null;
                         User_InterfaceObj.GetComponent<puppet>().SetTransform(User_InterfaceObj.transform.localPosition, User_InterfaceObj.transform.localRotation, puppet.trans_flag_position | puppet.trans_flag_rotation);
+                        Debug.Log("user (" + user + ") leave cockpit");
                     }
                 }
                 return true;

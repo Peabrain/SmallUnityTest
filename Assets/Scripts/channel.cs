@@ -43,12 +43,15 @@ public class channel : MonoBehaviour
     {
         entities[contID] = g;
         mynetwork.RegisterChannelToSocketdata(contID, number);
+        Debug.Log("Channel: " + number + ", register entry: " + contID + " (" + g.name + ")");
     }
     internal virtual void UnregisterEntity(int contID)
     {
         if(entities.ContainsKey(contID))
         {
+            GameObject g = entities[contID];
             entities.Remove(contID);
+            Debug.Log("Channel: " + number + ", unregister entry: " + contID + " (" + g.name + ")");
         }
         mynetwork.UnregisterChannelToSocketdata(contID, number);
     }
@@ -56,6 +59,8 @@ public class channel : MonoBehaviour
     {
         if (entities.ContainsKey(contID))
             return entities[contID];
+        else
+            Debug.Log("Channel: " + number + ", entry: " + contID + " not found");
         return null;
     }
     internal IDictionaryEnumerator FirstEntity()
