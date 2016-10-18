@@ -43,6 +43,7 @@ public class game : receiver {
             TimeSpan duration = now - last_clientupdate;
             if (duration > TimeSpan.FromMilliseconds(100))
             {
+                float time = Time.time;
                 last_clientupdate = now;
                 network_data.move_player m = new network_data.move_player();
                 IDictionaryEnumerator i = Channel.FirstEntity();
@@ -53,6 +54,7 @@ public class game : receiver {
                     m.position = ((GameObject)i.Value).transform.localPosition;
                     m.velocity = ((GameObject)i.Value).GetComponent<ship>().GetVelocity();
                     m.rotation = ((GameObject)i.Value).transform.localRotation;
+                    m.time = time;
                     byte[] data1 = network_utils.nData.Instance.SerializeMsg<network_data.move_player>(m);
 
                     foreach(KeyValuePair<int,GameObject> gg in ShipList)
@@ -60,6 +62,7 @@ public class game : receiver {
                 }
             }
         }
+        ServerTime.Update(Time.deltaTime);
     }
     public override void ProcessMessage(ref byte[] message)
     {
@@ -79,12 +82,12 @@ public class game : receiver {
                         {
                             if (!s.IsCockpitUsedByMe())
                             {
-                                g.GetComponent<ship>().SetTransform(com.position, com.rotation,puppet.trans_flag_position | puppet.trans_flag_rotation);
+                                g.GetComponent<ship>().SetTransform(com.position, com.rotation,puppet.trans_flag_position | puppet.trans_flag_rotation,com.time);
                                 g.GetComponent<ship>().SetMoveVector(com.position);
                                 g.GetComponent<ship>().SetVelocity(com.velocity);
                             }
                             else
-                                g.GetComponent<ship>().SetTransform(com.position, com.rotation, puppet.trans_flag_position);
+                                g.GetComponent<ship>().SetTransform(com.position, com.rotation, puppet.trans_flag_position,com.time);
                         }
                     }
                     else
@@ -95,7 +98,7 @@ public class game : receiver {
                             Debug.Log("ShipID " + com.header.containerID + " not found");
                         else
                         {
-                            g.GetComponent<ship>().SetTransform(com.position, com.rotation, puppet.trans_flag_rotation);
+                            g.GetComponent<ship>().SetTransform(com.position, com.rotation, puppet.trans_flag_rotation,Time.time);
                             //                        g.GetComponent<ship>().SetTransform(com.position,com.rotation);
                             g.GetComponent<ship>().SetMoveVector(com.position);
                             g.GetComponent<ship>().SetVelocity(com.velocity);

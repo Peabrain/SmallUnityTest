@@ -106,7 +106,7 @@ public class ilink_cockpit : interactionlink
                     if (c == contID)
                     {
                         user_obj = null;
-                        User_InterfaceObj.GetComponent<puppet>().SetTransform(User_InterfaceObj.transform.localPosition, User_InterfaceObj.transform.localRotation, puppet.trans_flag_position | puppet.trans_flag_rotation);
+                        User_InterfaceObj.GetComponent<puppet>().SetTransform(User_InterfaceObj.transform.localPosition, User_InterfaceObj.transform.localRotation, puppet.trans_flag_position | puppet.trans_flag_rotation,Time.time);
                         Debug.Log("user (" + user + ") leave cockpit");
                     }
                 }

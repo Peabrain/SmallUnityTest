@@ -51,9 +51,11 @@ public class server : network {
     {
         string s = "Server is running. (" + GetConnectedClients() + ")";
         GUI.Label(new Rect(2, 10, 150, 100), s);
+        s = "ServerTime " + Time.time.ToString("0.0000");
+        GUI.Label(new Rect(2, 10 + 15, 150, 100), s);
     }
-// Update is called once per frame
-	void Update () {
+    // Update is called once per frame
+    void Update () {
         CheckPingOut();
         checkDel();
         List<network_utils.cl_data> messages = new List<network_utils.cl_data>();
@@ -79,6 +81,9 @@ public class server : network {
                 case (int)network_data.COMMANDS.cping:
                     {
                         network_data.ping com = network_utils.nData.Instance.DeserializeMsg<network_data.ping>(bb.data);
+                        com.relfecttime = Time.time;
+                        byte[] data = network_utils.nData.Instance.SerializeMsg<network_data.ping>(com);
+                        Send(com.header.containerID, data);
                     }
                     break;
                 case (int)network_data.COMMANDS.cset_ingame_param:
@@ -152,6 +157,7 @@ public class server : network {
         network_data.set_ingame_param m = new set_ingame_param();
         m.set(id,0);
         m.shipchannel = 1;
+        m.servertime = ServerTime.time;
         byte[] data = network_utils.nData.Instance.SerializeMsg<network_data.set_ingame_param>(m);
         Send(id, data);
 

@@ -113,11 +113,13 @@ public class ship : puppet {
 
             if (duration > TimeSpan.FromMilliseconds(100) && g != null)
             {
+                float time = Time.time;
                 last_clientupdate = now;
                 network_data.move_player m = new network_data.move_player();
                 m.set(id, Channel.GetChannel());
                 m.position = g.transform.localPosition;
                 m.rotation = g.transform.localRotation;
+                m.time = time;
                 byte[] data1 = network_utils.nData.Instance.SerializeMsg<network_data.move_player>(m);
                 Channel.GetNetwork().Send(id, data1);
 
@@ -128,6 +130,7 @@ public class ship : puppet {
                     m2.position = transform.localPosition;
                     m2.rotation = transform.localRotation;
                     m2.velocity = targetVelocity;
+                    m2.time = time;
                     byte[] data = network_utils.nData.Instance.SerializeMsg<network_data.move_player>(m2);
                     Game.GetComponent<channel>().GetNetwork().Send(GetComponent<channel>().GetChannel(), data);
                 }
@@ -158,7 +161,7 @@ public class ship : puppet {
         spos = (spos + 1) % 2;
         return Spawnpoints[s];
     }
-    public void SpawnPlayer(int contID,bool IsClient,bool ownPlayer,Vector3 position,Quaternion rotation)
+    public void SpawnPlayer(int contID,bool IsClient,bool ownPlayer,Vector3 position,Quaternion rotation,float time)
     {
         Vector3 re = rotation.eulerAngles;
         GameObject Player = Instantiate(Resources.Load("Prefabs/Player", typeof(GameObject)),transform) as GameObject;
@@ -186,7 +189,7 @@ public class ship : puppet {
             Player.AddComponent<puppet>();
             Player.GetComponent<puppet>().InitTransform(position, rotation);// rotation);
         }
-        Player.GetComponent<puppet>().SetTransform(position, rotation,puppet.trans_flag_position | puppet.trans_flag_rotation);
+        Player.GetComponent<puppet>().SetTransform(position, rotation,puppet.trans_flag_position | puppet.trans_flag_rotation,time);
         if (Player) Debug.Log("Enter Ship (" + Channel.GetChannel() + ")" + " player " + contID + " pos: " + position + " rot:" + re.x + "," + re.y + "," + re.z);
 
         if(IsClient == false)
@@ -231,7 +234,7 @@ public class ship : puppet {
                     if (Channel.GetNetwork().IsClient() == false)
                     {
                         GameObject g = GetNextSpawnPoint();
-                        SpawnPlayer(com.header.containerID, Channel.GetNetwork().IsClient(), false, g.transform.localPosition, g.transform.localRotation);
+                        SpawnPlayer(com.header.containerID, Channel.GetNetwork().IsClient(), false, g.transform.localPosition, g.transform.localRotation,0);
                     }
                 }
                 break;
@@ -240,7 +243,7 @@ public class ship : puppet {
                     network_data.create_player com = network_utils.nData.Instance.DeserializeMsg<network_data.create_player>(message);
                     if (Channel.GetNetwork().IsClient() == true)
                     {
-                        SpawnPlayer(com.header.containerID, Channel.GetNetwork().IsClient(), Channel.GetNetwork().GetComponent<client>().ingameContID == com.header.containerID, com.position, com.rotation);
+                        SpawnPlayer(com.header.containerID, Channel.GetNetwork().IsClient(), Channel.GetNetwork().GetComponent<client>().ingameContID == com.header.containerID, com.position, com.rotation,0);
                     }
                 }
                 break;
@@ -254,7 +257,7 @@ public class ship : puppet {
                             GameObject g = Channel.GetEntity(com.header.containerID);
                             if (g != null)
                             {
-                                g.GetComponent<puppet>().SetTransform(com.position, com.rotation, puppet.trans_flag_position | puppet.trans_flag_rotation);
+                                g.GetComponent<puppet>().SetTransform(com.position, com.rotation, puppet.trans_flag_position | puppet.trans_flag_rotation,com.time);
                             }
                         }
                     }
@@ -263,7 +266,7 @@ public class ship : puppet {
                         GameObject g = Channel.GetEntity(com.header.containerID);
                         if (g != null)
                         {
-                            g.GetComponent<puppet>().SetTransform(com.position,com.rotation, puppet.trans_flag_position | puppet.trans_flag_rotation);
+                            g.GetComponent<puppet>().SetTransform(com.position,com.rotation, puppet.trans_flag_position | puppet.trans_flag_rotation,com.time);
                         }
                     }
                 }

@@ -53,12 +53,22 @@ public class puppet : receiver {
             if ((flags & trans_flag_rotation) == trans_flag_rotation)
                 transform.localRotation = Quaternion.Lerp(lastRot, destRot, syncTime / syncDelay);
         }
+        else
+        {
+            if ((flags & trans_flag_position) == trans_flag_position)
+                transform.localPosition = destPos;
+            if ((flags & trans_flag_rotation) == trans_flag_rotation)
+                transform.localRotation = destRot;
+        }
     }
-    public void SetTransform(Vector3 v,Quaternion r,int flags)
+    public void SetTransform(Vector3 v,Quaternion r,int flags,float time)
     {
         syncTime = 0f;
-        syncDelay = Time.time - lastTime;
-        lastTime = Time.time;
+        if (lastTime > 0)
+            syncDelay = time - lastTime;
+        else
+            syncDelay = 0;
+        lastTime = time;
         lastPos = transform.localPosition;
         lastRot = transform.localRotation;
         if ((flags & trans_flag_position) == trans_flag_position)

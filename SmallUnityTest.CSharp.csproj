@@ -79,6 +79,7 @@
     <Compile Include="Assets\Scripts\puppetcontrol.cs" />
     <Compile Include="Assets\Scripts\receiver.cs" />
     <Compile Include="Assets\Scripts\server.cs" />
+    <Compile Include="Assets\Scripts\servertime.cs" />
     <Compile Include="Assets\Scripts\ship.cs" />
     <Compile Include="Assets\Scripts\trigger.cs" />
   </ItemGroup>

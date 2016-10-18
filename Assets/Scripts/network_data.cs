@@ -109,196 +109,208 @@ namespace network_data
             get { return Header; }
             set { Header = value; }
         }
-        private HEADER Header;
-    }
-/*    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct enter_lobby
-    {
-        public void set(int contID)
+        public float sendtime
         {
-            HEADER h = new HEADER();
-            h.command = (int)COMMANDS.center_lobby;
-            h.signum = SIGNUM.BIN;
-            h.containerID = contID;
-            h.size = network_utils.nData.Instance.getSize<enter_lobby>();
-            header = h;
+            get { return SendTime; }
+            set { SendTime = value; }
         }
-        public HEADER header
+        public float relfecttime
         {
-            get { return Header; }
-            set { Header = value; }
+            get { return RelfectTime; }
+            set { RelfectTime = value; }
         }
         private HEADER Header;
+        private float SendTime;
+        private float RelfectTime;
     }
-    public struct leave_lobby
-    {
-        public void set(int contID)
+    /*    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        public struct enter_lobby
         {
-            HEADER h = new HEADER();
-            h.command = (int)COMMANDS.cleave_lobby;
-            h.signum = SIGNUM.BIN;
-            h.containerID = contID;
-            h.size = network_utils.nData.Instance.getSize<leave_lobby>();
-            header = h;
+            public void set(int contID)
+            {
+                HEADER h = new HEADER();
+                h.command = (int)COMMANDS.center_lobby;
+                h.signum = SIGNUM.BIN;
+                h.containerID = contID;
+                h.size = network_utils.nData.Instance.getSize<enter_lobby>();
+                header = h;
+            }
+            public HEADER header
+            {
+                get { return Header; }
+                set { Header = value; }
+            }
+            private HEADER Header;
         }
-        public HEADER header
+        public struct leave_lobby
         {
-            get { return Header; }
-            set { Header = value; }
+            public void set(int contID)
+            {
+                HEADER h = new HEADER();
+                h.command = (int)COMMANDS.cleave_lobby;
+                h.signum = SIGNUM.BIN;
+                h.containerID = contID;
+                h.size = network_utils.nData.Instance.getSize<leave_lobby>();
+                header = h;
+            }
+            public HEADER header
+            {
+                get { return Header; }
+                set { Header = value; }
+            }
+            private HEADER Header;
         }
-        private HEADER Header;
-    }
-/*        [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct session_create
-    {
-        public void set(int contID,network_lobby.SESSION_DATA data)
+    /*        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        public struct session_create
         {
-            HEADER h = new HEADER();
-            h.command = (int)COMMANDS.csesson_create;
-            h.signum = SIGNUM.BIN;
-            h.containerID = contID;
-            h.size = network_utils.nData.Instance.getSize<session_create>();
-            header = h;
-            this.data = data;
+            public void set(int contID,network_lobby.SESSION_DATA data)
+            {
+                HEADER h = new HEADER();
+                h.command = (int)COMMANDS.csesson_create;
+                h.signum = SIGNUM.BIN;
+                h.containerID = contID;
+                h.size = network_utils.nData.Instance.getSize<session_create>();
+                header = h;
+                this.data = data;
+            }
+            public HEADER header
+            {
+                get { return Header; }
+                set { Header = value; }
+            }
+            public network_lobby.SESSION_DATA data
+            {
+                get { return Data; }
+                set { Data = value; }
+            }
+            private HEADER Header;
+            private network_lobby.SESSION_DATA Data;
         }
-        public HEADER header
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        public struct session_delete
         {
-            get { return Header; }
-            set { Header = value; }
+            public void set(int contID)
+            {
+                HEADER h = new HEADER();
+                h.command = (int)COMMANDS.csesson_delete;
+                h.signum = SIGNUM.BIN;
+                h.containerID = contID;
+                h.size = network_utils.nData.Instance.getSize<session_delete>();
+                header = h;
+            }
+            public HEADER header
+            {
+                get { return Header; }
+                set { Header = value; }
+            }
+            HEADER Header;
         }
-        public network_lobby.SESSION_DATA data
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        public struct session_enter
         {
-            get { return Data; }
-            set { Data = value; }
+            public void set(int contID, int team)
+            {
+                HEADER h = new HEADER();
+                h.command = (int)COMMANDS.csesson_enter;
+                h.signum = SIGNUM.BIN;
+                h.containerID = contID;
+                h.size = network_utils.nData.Instance.getSize<session_enter>();
+                header = h;
+                this.team = team;
+            }
+            public HEADER header
+            {
+                get { return Header; }
+                set { Header = value; }
+            }
+            public int contID
+            {
+                get { return ContID; }
+                set { ContID = value; }
+            }
+            public int team
+            {
+                get { return Team; }
+                set { Team = value; }
+            }
+            private HEADER Header;
+            private int ContID;
+            private int Team;
         }
-        private HEADER Header;
-        private network_lobby.SESSION_DATA Data;
-    }
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct session_delete
-    {
-        public void set(int contID)
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        public struct session_start
         {
-            HEADER h = new HEADER();
-            h.command = (int)COMMANDS.csesson_delete;
-            h.signum = SIGNUM.BIN;
-            h.containerID = contID;
-            h.size = network_utils.nData.Instance.getSize<session_delete>();
-            header = h;
+            public void set(int contID, int port,int ki,int player_id,string servername)
+            {
+                HEADER h = new HEADER();
+                h.command = (int)COMMANDS.cstart_session;
+                h.signum = SIGNUM.BIN;
+                h.containerID = contID;
+                h.size = network_utils.nData.Instance.getSize<session_start>();
+                header = h;
+                this.session_port = port;
+                this.ki = ki;
+                this.player_id = player_id;
+                this.servername = servername;
+            }
+            public HEADER header
+            {
+                get { return Header; }
+                set { Header = value; }
+            }
+            public int session_port
+            {
+                get { return Session_port; }
+                set { Session_port = value; }
+            }
+            public int ki
+            {
+                get { return Ki; }
+                set { Ki = value; }
+            }
+            public int team
+            {
+                get { return Team; }
+                set { Team = value; }
+            }
+            public int player_id
+            {
+                get { return Player_id; }
+                set { Player_id = value; }
+            }
+            public string servername
+            {
+                get { return Servername; }
+                set { Servername = value; }
+            }
+            private HEADER Header;
+            private int Session_port;
+            private int Ki;
+            private int Team;
+            private int Player_id;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
+            private string Servername;
         }
-        public HEADER header
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        public struct end_ingame
         {
-            get { return Header; }
-            set { Header = value; }
+            public void set(int contID)
+            {
+                HEADER h = new HEADER();
+                h.command = (int)COMMANDS.cend_ingame;
+                h.signum = SIGNUM.BIN;
+                h.containerID = contID;
+                h.size = network_utils.nData.Instance.getSize<session_start>();
+                header = h;
+            }
+            public HEADER header
+            {
+                get { return Header; }
+                set { Header = value; }
+            }
+            private HEADER Header;
         }
-        HEADER Header;
-    }
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct session_enter
-    {
-        public void set(int contID, int team)
-        {
-            HEADER h = new HEADER();
-            h.command = (int)COMMANDS.csesson_enter;
-            h.signum = SIGNUM.BIN;
-            h.containerID = contID;
-            h.size = network_utils.nData.Instance.getSize<session_enter>();
-            header = h;
-            this.team = team;
-        }
-        public HEADER header
-        {
-            get { return Header; }
-            set { Header = value; }
-        }
-        public int contID
-        {
-            get { return ContID; }
-            set { ContID = value; }
-        }
-        public int team
-        {
-            get { return Team; }
-            set { Team = value; }
-        }
-        private HEADER Header;
-        private int ContID;
-		private int Team;
-    }
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct session_start
-    {
-        public void set(int contID, int port,int ki,int player_id,string servername)
-        {
-            HEADER h = new HEADER();
-            h.command = (int)COMMANDS.cstart_session;
-            h.signum = SIGNUM.BIN;
-            h.containerID = contID;
-            h.size = network_utils.nData.Instance.getSize<session_start>();
-            header = h;
-            this.session_port = port;
-            this.ki = ki;
-            this.player_id = player_id;
-            this.servername = servername;
-        }
-        public HEADER header
-        {
-            get { return Header; }
-            set { Header = value; }
-        }
-        public int session_port
-        {
-            get { return Session_port; }
-            set { Session_port = value; }
-        }
-        public int ki
-        {
-            get { return Ki; }
-            set { Ki = value; }
-        }
-        public int team
-        {
-            get { return Team; }
-            set { Team = value; }
-        }
-        public int player_id
-        {
-            get { return Player_id; }
-            set { Player_id = value; }
-        }
-        public string servername
-        {
-            get { return Servername; }
-            set { Servername = value; }
-        }
-        private HEADER Header;
-        private int Session_port;
-        private int Ki;
-		private int Team;
-		private int Player_id;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
-        private string Servername;
-    }
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct end_ingame
-    {
-        public void set(int contID)
-        {
-            HEADER h = new HEADER();
-            h.command = (int)COMMANDS.cend_ingame;
-            h.signum = SIGNUM.BIN;
-            h.containerID = contID;
-            h.size = network_utils.nData.Instance.getSize<session_start>();
-            header = h;
-        }
-        public HEADER header
-        {
-            get { return Header; }
-            set { Header = value; }
-        }
-        private HEADER Header;
-    }
-*/
+    */
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct set_ingame_param
     {
@@ -327,10 +339,16 @@ namespace network_data
             get { return ShipChannel; }
             set { ShipChannel = value; }
         }
+        public float servertime
+        {
+            get { return Servertime; }
+            set { Servertime = value; }
+        }
         private HEADER Header;
+        private int ShipChannel;
+        private float Servertime;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
         private string Playername;
-        private int ShipChannel;
     }
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct enter_ship
@@ -436,10 +454,16 @@ namespace network_data
             get { return Velocity; }
             set { Velocity = value; }
         }
+        public float time
+        {
+            get { return Time; }
+            set { Time = value; }
+        }
         private HEADER Header;
         private Vector3 Position;
         private Quaternion Rotation;
         private Vector3 Velocity;
+        private float Time;
     }
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct disconnect
