@@ -12,6 +12,8 @@ using System.Text;
 
 public class network : MonoBehaviour {
 
+    public System.Diagnostics.Stopwatch Timer = System.Diagnostics.Stopwatch.StartNew();
+
     public class SocketData
     {
         public SocketData()

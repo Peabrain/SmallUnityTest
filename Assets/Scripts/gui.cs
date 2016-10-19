@@ -7,14 +7,15 @@ public class gui : MonoBehaviour {
     // Use this for initialization
     private bool isAtStartup = true;
     bool isClient = false;
-    public string myserver;
+    public string myserver = "localhost";
     List<GameObject> userInterfaceList = new List<GameObject>();
     GameObject game = null;
     
     void Awake()
     {
         string[] sys = System.Environment.GetCommandLineArgs();
-        foreach(string s in sys)
+        myserver = "localhost";
+        foreach (string s in sys)
         {
             if (s == "-batchmode")
             {

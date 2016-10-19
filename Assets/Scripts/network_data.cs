@@ -109,19 +109,19 @@ namespace network_data
             get { return Header; }
             set { Header = value; }
         }
-        public float sendtime
+        public long sendtime
         {
             get { return SendTime; }
             set { SendTime = value; }
         }
-        public float relfecttime
+        public long relfecttime
         {
             get { return RelfectTime; }
             set { RelfectTime = value; }
         }
         private HEADER Header;
-        private float SendTime;
-        private float RelfectTime;
+        private long SendTime;
+        private long RelfectTime;
     }
     /*    [StructLayout(LayoutKind.Sequential, Pack = 1)]
         public struct enter_lobby

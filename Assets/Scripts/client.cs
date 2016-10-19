@@ -16,9 +16,16 @@ public class client : network {
     public bool ending = false;
     public int port = 40000;
     SocketData socketdata = new SocketData();
-    float timedelta = 0.0f;
+    bool pingInit = false;
+    long [] timedelta = new long[8];
+    long lasttimedelta;
+    int timedeltaIndex = 0;
+    long lastPing;
     // Use this for initialization
     void Start () {
+        lastPing = Timer.ElapsedMilliseconds;
+        for (int i = 0; i < 8; i++)
+            timedelta[i] = 0;
     }
 
 
@@ -29,12 +36,14 @@ public class client : network {
     void Update () {
         if (ingameContID != -1)
         {
-            TimeSpan duration = DateTime.Now - socketdata.time;
-            if (duration > TimeSpan.FromSeconds(1))
+            long l = Timer.ElapsedMilliseconds;
+            long duration = Timer.ElapsedMilliseconds - lastPing;
+            if (duration > 250)
             {
+                lastPing = l;
                 network_data.ping m = new network_data.ping();
                 m.set(ingameContID,0);
-                m.sendtime = Time.time;
+                m.sendtime = Timer.ElapsedMilliseconds;
                 byte[] data = network_utils.nData.Instance.SerializeMsg<network_data.ping>(m);
                 Send(ingameContID,data);
             }
@@ -55,10 +64,30 @@ public class client : network {
                         {
                             case (int)network_data.COMMANDS.cping:
                                 {
+                                    long ti = Timer.ElapsedMilliseconds;
                                     network_data.ping com = network_utils.nData.Instance.DeserializeMsg<network_data.ping>(data);
-                                    float delta = Time.time - com.sendtime;
-                                    float t = com.relfecttime + delta / 2.0f;
-                                    timedelta = Mathf.Abs(ServerTime.time - t);
+                                    long t = 0;
+                                    if (pingInit == false)
+                                    {
+                                        t = com.relfecttime + (ti - com.sendtime) / 2 - ti;
+                                        pingInit = true;
+                                        ServerTime.time = t;
+                                    }
+                                    else
+                                    {
+                                        long delta1 = (ti - com.sendtime) / 2;
+                                        long delta = 0;
+//                                        for (int j = 0; j < 8; j++) delta += timedelta[j];
+//                                        delta /= 8;
+//                                        if (Math.Abs(delta) < Math.Abs(delta1 / 2)) delta1 = 0;
+                                        timedelta[timedeltaIndex] = delta1;
+                                        timedeltaIndex = (timedeltaIndex + 1) % 8;
+                                        for (int j = 0; j < 8; j++) delta += timedelta[j];
+                                        delta /= 8;
+                                        t = com.relfecttime + delta - ti;
+                                    }
+//                                    lasttimedelta = Mathf.Abs(ServerTime.time - t);
+                                    lasttimedelta = ServerTime.time - t;
                                     ServerTime.time = t;
                                 }
                                 break;
@@ -208,7 +237,7 @@ public class client : network {
     {
         string s = "Client contID " + ingameContID;
         GUI.Label(new Rect(2, 10, 150, 100), s);
-        s = "ServerTime " + ServerTime.time.ToString("0.0000") + ", Delta " + timedelta.ToString("0.0000");
+        s = "ServerTime " + (Timer.ElapsedMilliseconds + ServerTime.time) + ", Delta " + (lasttimedelta).ToString("0") + " ms";
         GUI.Label(new Rect(2, 10 + 15, 300, 100), s);
     }
 }
